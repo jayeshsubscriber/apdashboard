@@ -3,6 +3,9 @@
 import { CurrentMonthEarningCard } from "./CurrentMonthEarningCard";
 import { PayoutSummaryCard } from "./PayoutSummaryCard";
 import { NewClientOnboardingCard } from "./NewClientOnboardingCard";
+import { ClientReferralLinkCard } from "./ClientReferralLinkCard";
+import { BusinessOpportunitiesCard } from "./BusinessOpportunitiesCard";
+import { WealthProductsCard } from "./WealthProductsCard";
 
 export function DashboardHome() {
   return (
@@ -12,10 +15,12 @@ export function DashboardHome() {
           <CurrentMonthEarningCard />
           <PayoutSummaryCard />
           <NewClientOnboardingCard />
+          <BusinessOpportunitiesCard />
+          <WealthProductsCard />
         </div>
 
-        {/* Reserved space for other right-side sections (Business Metrics, What's New, etc.) */}
         <aside className="col-span-3 flex flex-col gap-3">
+          <ClientReferralLinkCard />
           <div className="h-[180px] rounded-md border border-border bg-card" />
         </aside>
       </div>

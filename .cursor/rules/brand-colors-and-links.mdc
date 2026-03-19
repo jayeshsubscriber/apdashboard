@@ -1,0 +1,13 @@
+---
+description: Enforce AP Dashboard brand color tokens and referral-link branding
+alwaysApply: true
+---
+
+# Brand Colors and Referral Links
+
+- Use semantic color tokens from `app/globals.css` (`bg-primary`, `text-primary`, `border-primary`, `border-border`, `text-muted-foreground`) instead of hardcoded hex values in components.
+- Primary branded actions, icons, and CTAs must use `primary` tokens unless a specific design exception is requested.
+- Avoid vendor-mismatched branding in UI copy, links, or assets.
+- For referral link UI in this project, use Upstox-branded URLs (not competitor domains).
+- Keep new UI consistent with existing token-based light/dark behavior.
+

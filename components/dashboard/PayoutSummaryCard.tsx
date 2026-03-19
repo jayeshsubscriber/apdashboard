@@ -34,6 +34,15 @@ const RANGE_OPTIONS: Array<{ id: RangeId; label: string; count: number }> = [
   { id: "last12", label: "Last 1 Year", count: 12 },
 ];
 
+const SERIES_COLORS = {
+  referralFee: "#6b2ba8",
+  brokerage: "#542087",
+  mfCommission: "#8b5cf6",
+  other: "#a78bfa",
+  consolidated: "#542087",
+} as const;
+const BAR_WIDTH = 26;
+
 // Realistic (dummy) payout figures per month until backend wiring.
 // Note: values are positive numbers to keep chart axes consistent.
 const PAYOUT_BY_MONTH: Record<
@@ -64,6 +73,7 @@ function formatMoney(v: number) {
 
 export function PayoutSummaryCard() {
   const [rangeId, setRangeId] = useState<RangeId>("last6");
+  const [showConsolidatedIncome, setShowConsolidatedIncome] = useState(false);
   const range = useMemo(
     () => RANGE_OPTIONS.find((o) => o.id === rangeId) ?? RANGE_OPTIONS[0],
     [rangeId]
@@ -77,17 +87,23 @@ export function PayoutSummaryCard() {
     return months.map((month) => ({
       month,
       ...PAYOUT_BY_MONTH[month],
+      consolidatedIncome:
+        PAYOUT_BY_MONTH[month].referralFee +
+        PAYOUT_BY_MONTH[month].brokerage +
+        PAYOUT_BY_MONTH[month].mfCommission +
+        PAYOUT_BY_MONTH[month].other,
     }));
   }, [months]);
 
   const tickInterval = months.length <= 6 ? 0 : 2;
-  // Grouped bars use individual series values, so Y axis max should not be the sum.
-  const maxValue = Math.max(
-    ...data.map((d) =>
-      Math.max(d.referralFee, d.brokerage, d.mfCommission, d.other)
-    ),
-    100
-  );
+  const maxValue = showConsolidatedIncome
+    ? Math.max(...data.map((d) => d.consolidatedIncome), 100)
+    : Math.max(
+        ...data.map((d) =>
+          Math.max(d.referralFee, d.brokerage, d.mfCommission, d.other)
+        ),
+        100
+      );
   const chartMax = Math.ceil(maxValue / 10000) * 10000;
 
   return (
@@ -100,7 +116,17 @@ export function PayoutSummaryCard() {
             </h2>
           </div>
 
-          <div className="shrink-0">
+          <div className="shrink-0 flex items-center gap-4">
+            <label className="inline-flex items-center gap-2 text-sm text-muted-foreground cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={showConsolidatedIncome}
+                onChange={(e) => setShowConsolidatedIncome(e.target.checked)}
+                className="h-4 w-4 rounded border-border text-primary focus-visible:ring-1 focus-visible:ring-primary"
+              />
+              Consolidated Income
+            </label>
+
             <select
               aria-label="Time interval"
               value={rangeId}
@@ -125,7 +151,7 @@ export function PayoutSummaryCard() {
               barCategoryGap="15%"
             >
               <CartesianGrid
-                stroke="var(--border)"
+                stroke="#e5e7eb"
                 strokeDasharray="3 3"
                 vertical={true}
                 horizontal={true}
@@ -136,50 +162,78 @@ export function PayoutSummaryCard() {
                 interval={tickInterval}
                 tickLine={false}
                 axisLine={false}
-                tick={{ fontSize: 14, fill: "var(--muted-foreground)" }}
+                tick={{ fontSize: 14, fill: "#6b7280" }}
               />
               <YAxis
                 tickLine={false}
                 axisLine={false}
                 width={52}
-                tick={{ fontSize: 14, fill: "var(--muted-foreground)" }}
+                tick={{ fontSize: 14, fill: "#6b7280" }}
                 domain={[0, chartMax]}
                 tickFormatter={formatMoney}
               />
 
-              <Legend
-                verticalAlign="top"
-                align="center"
-                height={34}
-                formatter={(value) => String(value)}
-                wrapperStyle={{ color: "var(--muted-foreground)" }}
-              />
+              {!showConsolidatedIncome && (
+                <Legend
+                  verticalAlign="top"
+                  align="center"
+                  height={34}
+                  formatter={(value) => String(value)}
+                  wrapperStyle={{ color: "#6b7280" }}
+                />
+              )}
 
-              {/* Grouped bars (one bar per series per month). */}
-              <Bar
-                dataKey="referralFee"
-                name="Referral Fee"
-                fill="var(--chart-1)"
-                radius={[4, 4, 0, 0]}
-              />
-              <Bar
-                dataKey="brokerage"
-                name="Brokerage"
-                fill="var(--chart-2)"
-                radius={[4, 4, 0, 0]}
-              />
-              <Bar
-                dataKey="mfCommission"
-                name="MF Commission"
-                fill="var(--chart-3)"
-                radius={[4, 4, 0, 0]}
-              />
-              <Bar
-                dataKey="other"
-                name="Other"
-                fill="var(--chart-4)"
-                radius={[4, 4, 0, 0]}
-              />
+              {showConsolidatedIncome && (
+                <Bar
+                  dataKey="consolidatedIncome"
+                  name="Consolidated Income"
+                  fill={SERIES_COLORS.consolidated}
+                  barSize={BAR_WIDTH}
+                  minPointSize={3}
+                  radius={[4, 4, 0, 0]}
+                />
+              )}
+
+              {!showConsolidatedIncome && (
+                <Bar
+                  dataKey="referralFee"
+                  name="Referral Fee"
+                  fill={SERIES_COLORS.referralFee}
+                  barSize={BAR_WIDTH}
+                  minPointSize={3}
+                  radius={[4, 4, 0, 0]}
+                />
+              )}
+              {!showConsolidatedIncome && (
+                <Bar
+                  dataKey="brokerage"
+                  name="Brokerage"
+                  fill={SERIES_COLORS.brokerage}
+                  barSize={BAR_WIDTH}
+                  minPointSize={3}
+                  radius={[4, 4, 0, 0]}
+                />
+              )}
+              {!showConsolidatedIncome && (
+                <Bar
+                  dataKey="mfCommission"
+                  name="MF Commission"
+                  fill={SERIES_COLORS.mfCommission}
+                  barSize={BAR_WIDTH}
+                  minPointSize={3}
+                  radius={[4, 4, 0, 0]}
+                />
+              )}
+              {!showConsolidatedIncome && (
+                <Bar
+                  dataKey="other"
+                  name="Other"
+                  fill={SERIES_COLORS.other}
+                  barSize={BAR_WIDTH}
+                  minPointSize={3}
+                  radius={[4, 4, 0, 0]}
+                />
+              )}
             </BarChart>
           </ResponsiveContainer>
         </div>
