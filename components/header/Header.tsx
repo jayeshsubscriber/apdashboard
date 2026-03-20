@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 const NAV_TABS = [
   { id: "dashboard", label: "Dashboard" },
   { id: "customers", label: "Customers" },
-  { id: "earnings", label: "Earnings" },
+  { id: "business", label: "Business" },
 ] as const;
 
 type TabId = (typeof NAV_TABS)[number]["id"];
@@ -28,10 +28,7 @@ export function Header({
   const [search, setSearch] = useState("");
 
   return (
-    <header
-      className="w-full flex flex-col"
-      style={{ backgroundColor: "var(--color-brand)" }}
-    >
+    <header className="w-full" style={{ backgroundColor: "var(--color-brand)" }}>
       <div className="flex items-center px-6 h-14 gap-6">
         <div className="flex items-center gap-2 shrink-0">
           <UpstoxLogo />
