@@ -280,13 +280,39 @@ function riskPillClass(risk: MfRow["risk"]) {
   return "bg-rose-50 text-rose-700 border-rose-200";
 }
 
+function fundLogoInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+function amcLogoDomain(amc: string) {
+  const normalized = amc.toLowerCase();
+  if (normalized.includes("axis")) return "axismf.com";
+  if (normalized.includes("icici")) return "icicipruamc.com";
+  if (normalized.includes("sbi")) return "sbimf.com";
+  if (normalized.includes("hdfc")) return "hdfcfund.com";
+  if (normalized.includes("kotak")) return "kotakmf.com";
+  if (normalized.includes("uti")) return "utimf.com";
+  if (normalized.includes("mirae")) return "miraeassetmf.co.in";
+  return "upstox.com";
+}
+
+function amcLogoUrl(amc: string) {
+  const domain = amcLogoDomain(amc);
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+}
+
 export function WealthProductsCard() {
   const [activeAdvisoryTab, setActiveAdvisoryTab] = useState<AdvisoryTab>("fo");
   const [activeIpoTab, setActiveIpoTab] = useState<IpoTab>("open");
   const [activeMfTab, setActiveMfTab] = useState<MfTab>("topRated");
 
   const advisoryRows = ADVISORY_BY_TAB[activeAdvisoryTab];
-  const ipoRows = activeIpoTab === "live" ? LIVE_IPOS : UPCOMING_IPOS;
+  const ipoRows = activeIpoTab === "open" ? LIVE_IPOS : UPCOMING_IPOS;
   const mfRows = MUTUAL_FUNDS[activeMfTab];
 
   return (
@@ -428,37 +454,37 @@ export function WealthProductsCard() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-[1.4fr_170px_140px_140px_130px_120px] border-b border-border px-3 py-2">
+              <div className="grid grid-cols-[minmax(180px,0.9fr)_180px_145px_145px_110px_200px] border-b border-border px-3 py-2 gap-x-2">
                 <div className="text-xs font-semibold text-muted-foreground">Name</div>
                 <div className="text-xs font-semibold text-muted-foreground text-right">Open/Close</div>
                 <div className="text-xs font-semibold text-muted-foreground text-right">Issue Size</div>
                 <div className="text-xs font-semibold text-muted-foreground text-right">Price Range</div>
                 <div className="text-xs font-semibold text-muted-foreground text-right">Subscription</div>
-                <div className="text-xs font-semibold text-muted-foreground text-right">Share</div>
+                <div className="text-xs font-semibold text-muted-foreground text-right">Actions</div>
               </div>
 
               <div className="max-h-[240px] overflow-auto">
                 {ipoRows.map((row) => (
                   <div
                     key={row.name}
-                    className="grid grid-cols-[1.4fr_170px_140px_140px_130px_120px] px-3 py-2 border-b border-border last:border-b-0"
+                    className="grid grid-cols-[minmax(180px,0.9fr)_180px_145px_145px_110px_200px] gap-x-2 px-3 py-2 border-b border-border last:border-b-0"
                   >
                     <div className="pr-2">
                       <div className="text-[13px] text-foreground truncate">{row.name}</div>
-                      <div className="text-[11px] text-muted-foreground">{row.marketType}</div>
+                      <div className="text-[11px] text-muted-foreground truncate">{row.marketType}</div>
                     </div>
-                    <div className="text-[13px] text-foreground text-right">{row.openClose}</div>
-                    <div className="text-[13px] text-foreground text-right">{row.issueSize}</div>
-                    <div className="text-[13px] text-foreground text-right">{row.priceRange}</div>
-                    <div className="text-[13px] text-foreground text-right">{row.subscription}</div>
-                    <div className="text-right inline-flex items-center justify-end gap-2">
+                    <div className="text-[13px] text-foreground text-right whitespace-nowrap">{row.openClose}</div>
+                    <div className="text-[13px] text-foreground text-right whitespace-nowrap">{row.issueSize}</div>
+                    <div className="text-[13px] text-foreground text-right whitespace-nowrap">{row.priceRange}</div>
+                    <div className="text-[13px] text-foreground text-right whitespace-nowrap">{row.subscription}</div>
+                    <div className="flex items-center justify-end gap-2">
                       <a
                         href={UPSTOX_IPO_URL}
                         target="_blank"
                         rel="noreferrer"
-                        className="h-7 rounded-md border border-primary px-2 text-[11px] font-semibold text-primary hover:bg-primary/5 transition-colors inline-flex items-center"
+                        className="inline-flex h-7 items-center justify-center rounded-md border border-primary px-2.5 text-[11px] font-semibold text-primary transition-colors hover:bg-primary/5 whitespace-nowrap"
                       >
-                        VIEW DETAILS
+                        View Details
                       </a>
                       <button
                         type="button"
@@ -510,10 +536,24 @@ export function WealthProductsCard() {
                     key={row.name}
                     className="rounded-md border border-border bg-card px-3 py-2 grid grid-cols-[1.5fr_90px_90px_90px_130px_130px_110px] items-center gap-3"
                   >
-                    <div>
-                      <div className="text-[13px] text-foreground truncate">{row.name}</div>
-                      <div className="text-[11px] text-muted-foreground">
-                        {row.amc} • {row.category}
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full border border-primary/20 bg-primary/10 text-[10px] font-semibold text-primary inline-flex items-center justify-center">
+                        {fundLogoInitials(row.name)}
+                        <img
+                          src={amcLogoUrl(row.amc)}
+                          alt={`${row.amc} logo`}
+                          className="absolute inset-0 h-full w-full rounded-full bg-white object-contain p-0.5"
+                          loading="lazy"
+                          onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                          }}
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-[13px] text-foreground truncate">{row.name}</div>
+                        <div className="text-[11px] text-muted-foreground truncate">
+                          {row.amc} • {row.category}
+                        </div>
                       </div>
                     </div>
                     <div className="text-right">

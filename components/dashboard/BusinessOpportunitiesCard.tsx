@@ -1,18 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { MessageCircle, Phone } from "lucide-react";
+import {
+  AlertTriangle,
+  BarChart3,
+  ChevronRight,
+  Crown,
+  Layers,
+  MessageCircle,
+  Phone,
+  TrendingDown,
+  UserCheck,
+  UserMinus,
+  UserPlus,
+} from "lucide-react";
 
 type MainTab = "atRiskClients" | "activation" | "crossSell";
 type ActivationTableFilter = "onboarded" | "activated" | "notActivated" | "leads";
 type ActivationRangeId = "last7" | "last30" | "last90";
-type AtRiskFilter = "mayStopTrading" | "highFnOLosses" | "topFivePercent";
-type CrossSellFilter = "fo" | "mfUpsell";
+type AtRiskFilter = "likelyToLapse" | "highFnOLosses" | "topFive";
+type CrossSellFilter = "equityPotential" | "mtf" | "fno" | "ipo" | "intraday" | "mf";
 
 const MAIN_TABS: Array<{ id: MainTab; label: string }> = [
-  { id: "atRiskClients", label: "At Risk Clients" },
-  { id: "activation", label: "Onboarding and Activation" },
-  { id: "crossSell", label: "Cross Sell" },
+  { id: "activation", label: "Onboarding & Activation" },
+  { id: "atRiskClients", label: "At Risk" },
+  { id: "crossSell", label: "Cross-Sell" },
 ];
 
 type ClientRow = { name: string; metric: string };
@@ -38,21 +50,19 @@ type ActivationLeadsRow = {
   status: string;
   currentStep: string;
 };
-type CrossSellFoRow = {
-  name: string;
-  productsActiveIn: string;
-  segmentStatus: "Segment Active" | "Segment Not Activated";
-};
-type CrossSellMfRow = {
-  name: string;
-  productsActiveIn: string;
+type CrossSellCard = {
+  id: CrossSellFilter;
+  title: string;
+  totalClients: number;
+  metricHeader: string;
+  clients: ClientRow[];
 };
 
 const TAB_CONTENT: Record<"atRiskClients" | "crossSell", TabContent> = {
   atRiskClients: {
     cards: [
       {
-        title: "May Stop Trading",
+        title: "Likely to lapse",
         totalClients: 25,
         metricHeader: "Last Traded Date",
         clients: [
@@ -255,61 +265,102 @@ const ACTIVATION_LEADS_ROWS: ActivationLeadsRow[] = [
   },
 ];
 
-const CROSS_SELL_SUMMARY = {
-  fo: 16,
-  mfUpsell: 14,
-};
-
-const CROSS_SELL_FO_ROWS: CrossSellFoRow[] = [
+const CROSS_SELL_CARDS: CrossSellCard[] = [
   {
-    name: "Rahul Suryawanshi (RSWY8821)",
-    productsActiveIn: "Equity, ETFs",
-    segmentStatus: "Segment Not Activated",
+    id: "equityPotential",
+    title: "Equity potential clients",
+    totalClients: 96,
+    metricHeader: "Interest Score",
+    clients: [
+      { name: "Samadhan Bhaskar Rakibe (SHJV1174)", metric: "86" },
+      { name: "Mira Trymbak Pawar (M61747471)", metric: "79" },
+      { name: "Yashodeep Kulkarni (AAA6180438)", metric: "72" },
+      { name: "Prasad Bhosale (PDBS8182)", metric: "69" },
+      { name: "Nikhil Patankar (SHJV2023)", metric: "66" },
+    ],
   },
   {
-    name: "Shruti Naik (SNIK2043)",
-    productsActiveIn: "Equity, MF",
-    segmentStatus: "Segment Active",
+    id: "mtf",
+    title: "MTF clients",
+    totalClients: 14,
+    metricHeader: "Upsell Value",
+    clients: [
+      { name: "Rahul Suryawanshi (RSWY8821)", metric: "₹31,200" },
+      { name: "Shruti Naik (SNIK2043)", metric: "₹28,900" },
+      { name: "Manish Korde (MKRD1297)", metric: "₹24,600" },
+      { name: "Tejas Patil (TPAT4471)", metric: "₹22,400" },
+      { name: "Aarti Kamble (AKMB3905)", metric: "₹21,100" },
+    ],
   },
   {
-    name: "Manish Korde (MKRD1297)",
-    productsActiveIn: "Bonds, NCD",
-    segmentStatus: "Segment Not Activated",
+    id: "fno",
+    title: "FNO clients",
+    totalClients: 16,
+    metricHeader: "Avg Volume",
+    clients: [
+      { name: "Ganesh Kadam (GNKD4528)", metric: "1.8x" },
+      { name: "Yogesh Pawar (YGPW6731)", metric: "1.6x" },
+      { name: "Sujata Koli (SJKL2087)", metric: "1.4x" },
+      { name: "Ninad Salvi (NDSL1128)", metric: "1.3x" },
+      { name: "Mrunal Jagtap (MRJT6650)", metric: "1.2x" },
+    ],
   },
   {
-    name: "Tejas Patil (TPAT4471)",
-    productsActiveIn: "Equity, ETFs, MF",
-    segmentStatus: "Segment Active",
+    id: "ipo",
+    title: "IPO clients",
+    totalClients: 2,
+    metricHeader: "Last IPO Click",
+    clients: [
+      { name: "Vivek Rane (VVRA3108)", metric: "2 days ago" },
+      { name: "Aniket Shinde (ANKS1472)", metric: "5 days ago" },
+      { name: "Priya Chavan (PRCV9324)", metric: "6 days ago" },
+      { name: "Kiran Jagtap (KRJT5506)", metric: "8 days ago" },
+      { name: "Deepali Mane (DPMN7112)", metric: "9 days ago" },
+    ],
   },
   {
-    name: "Aarti Kamble (AKMB3905)",
-    productsActiveIn: "FD, Bonds",
-    segmentStatus: "Segment Not Activated",
+    id: "intraday",
+    title: "Intraday clients",
+    totalClients: 96,
+    metricHeader: "Sessions (30D)",
+    clients: [
+      { name: "Priya Chavan (PRCV9324)", metric: "24" },
+      { name: "Kiran Jagtap (KRJT5506)", metric: "21" },
+      { name: "Deepali Mane (DPMN7112)", metric: "18" },
+      { name: "Samadhan Bhaskar Rakibe (SHJV1174)", metric: "16" },
+      { name: "Mira Trymbak Pawar (M61747471)", metric: "15" },
+    ],
   },
-];
-
-const CROSS_SELL_MF_ROWS: CrossSellMfRow[] = [
-  { name: "Omkar Nimbalkar (OMNB3321)", productsActiveIn: "Equity, ETFs" },
-  { name: "Rutuja Jadhav (RTJD5503)", productsActiveIn: "Equity, F&O" },
-  { name: "Neha More (NHMR7409)", productsActiveIn: "Equity" },
-  { name: "Vikram Chavan (VKCV1985)", productsActiveIn: "Equity, Bonds" },
-  { name: "Dhanashree Kale (DNKL7771)", productsActiveIn: "Equity, ETFs, FD" },
+  {
+    id: "mf",
+    title: "MF clients",
+    totalClients: 381,
+    metricHeader: "MF Balance",
+    clients: [
+      { name: "Prasad Bhosale (PDBS8182)", metric: "Rs 12.5L" },
+      { name: "Mira Trymbak Pawar (M61747471)", metric: "Rs 9.8L" },
+      { name: "Rahul Singh (SHJV1187)", metric: "Rs 7.2L" },
+      { name: "Yashodeep Kulkarni (AAA6180438)", metric: "Rs 6.4L" },
+      { name: "Neha Kulkarni (AADK110932)", metric: "Rs 5.9L" },
+    ],
+  },
 ];
 
 export function BusinessOpportunitiesCard() {
   const [activeNavTab, setActiveNavTab] = useState<MainTab>("atRiskClients");
-  const [atRiskFilter, setAtRiskFilter] = useState<AtRiskFilter>("mayStopTrading");
+  const [atRiskFilter, setAtRiskFilter] = useState<AtRiskFilter>("likelyToLapse");
   const [activationTableFilter, setActivationTableFilter] =
     useState<ActivationTableFilter>("leads");
   const [activationRangeId, setActivationRangeId] =
     useState<ActivationRangeId>("last30");
-  const [crossSellFilter, setCrossSellFilter] = useState<CrossSellFilter>("fo");
+  const [crossSellFilter, setCrossSellFilter] = useState<CrossSellFilter>("equityPotential");
 
   const atRiskCardMap: Record<AtRiskFilter, OpportunityCardData> = {
-    mayStopTrading: TAB_CONTENT.atRiskClients.cards[0],
+    likelyToLapse: TAB_CONTENT.atRiskClients.cards[0],
     highFnOLosses: TAB_CONTENT.atRiskClients.cards[1],
-    topFivePercent: TAB_CONTENT.atRiskClients.cards[2],
+    topFive: TAB_CONTENT.atRiskClients.cards[2],
   };
+  const activeCrossSellCard = CROSS_SELL_CARDS.find((card) => card.id === crossSellFilter) ?? CROSS_SELL_CARDS[0];
 
   return (
     <section className="rounded-md border border-border bg-card overflow-hidden min-h-[420px]">
@@ -330,7 +381,7 @@ export function BusinessOpportunitiesCard() {
                     activeNavTab === tab.id
                       ? "text-primary border-primary"
                       : "text-muted-foreground border-transparent hover:text-foreground"
-                  } focus-visible:ring-1 focus-visible:ring-primary rounded-sm`}
+                  } focus-visible:ring-1 focus-visible:ring-primary rounded-none`}
                 >
                   {tab.label}
                 </button>
@@ -357,44 +408,62 @@ export function BusinessOpportunitiesCard() {
                   <div className="p-3 space-y-2">
                     <button
                       type="button"
-                      onClick={() => setAtRiskFilter("mayStopTrading")}
-                      className={`w-full text-left rounded-md border px-3 py-2 transition-colors ${
-                        atRiskFilter === "mayStopTrading"
-                          ? "border-primary bg-primary/5"
-                          : "border-border"
+                      onClick={() => setAtRiskFilter("likelyToLapse")}
+                      className={`w-full text-left rounded-md px-3 py-2 transition-colors ${
+                        atRiskFilter === "likelyToLapse"
+                          ? "bg-primary/5"
+                          : "bg-background hover:bg-muted/30"
                       }`}
                     >
-                      <div className="text-xs text-muted-foreground">May Stop Trading</div>
-                      <div className="text-3xl font-semibold text-foreground leading-none mt-1">
-                        {atRiskCardMap.mayStopTrading.totalClients}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <AlertTriangle size={16} className={atRiskFilter === "likelyToLapse" ? "text-primary" : "text-muted-foreground"} />
+                          <div className="truncate text-[13px] font-medium text-foreground">Likely to lapse</div>
+                        </div>
+                        <div className={`flex flex-shrink-0 items-center gap-2 text-[12px] font-semibold ${atRiskFilter === "likelyToLapse" ? "text-primary" : "text-muted-foreground"}`}>
+                          <span>{atRiskCardMap.likelyToLapse.totalClients} users</span>
+                          <ChevronRight size={16} className={atRiskFilter === "likelyToLapse" ? "text-primary" : "text-muted-foreground"} />
+                        </div>
                       </div>
                     </button>
                     <button
                       type="button"
                       onClick={() => setAtRiskFilter("highFnOLosses")}
-                      className={`w-full text-left rounded-md border px-3 py-2 transition-colors ${
+                      className={`w-full text-left rounded-md px-3 py-2 transition-colors ${
                         atRiskFilter === "highFnOLosses"
-                          ? "border-primary bg-primary/5"
-                          : "border-border"
+                          ? "bg-primary/5"
+                          : "bg-background hover:bg-muted/30"
                       }`}
                     >
-                      <div className="text-xs text-muted-foreground">High F&O Losses</div>
-                      <div className="text-3xl font-semibold text-foreground leading-none mt-1">
-                        {atRiskCardMap.highFnOLosses.totalClients}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <TrendingDown size={16} className={atRiskFilter === "highFnOLosses" ? "text-primary" : "text-muted-foreground"} />
+                          <div className="truncate text-[13px] font-medium text-foreground">High F&O Losses</div>
+                        </div>
+                        <div className={`flex flex-shrink-0 items-center gap-2 text-[12px] font-semibold ${atRiskFilter === "highFnOLosses" ? "text-primary" : "text-muted-foreground"}`}>
+                          <span>{atRiskCardMap.highFnOLosses.totalClients} users</span>
+                          <ChevronRight size={16} className={atRiskFilter === "highFnOLosses" ? "text-primary" : "text-muted-foreground"} />
+                        </div>
                       </div>
                     </button>
                     <button
                       type="button"
-                      onClick={() => setAtRiskFilter("topFivePercent")}
-                      className={`w-full text-left rounded-md border px-3 py-2 transition-colors ${
-                        atRiskFilter === "topFivePercent"
-                          ? "border-primary bg-primary/5"
-                          : "border-border"
+                      onClick={() => setAtRiskFilter("topFive")}
+                      className={`w-full text-left rounded-md px-3 py-2 transition-colors ${
+                        atRiskFilter === "topFive"
+                          ? "bg-primary/5"
+                          : "bg-background hover:bg-muted/30"
                       }`}
                     >
-                      <div className="text-xs text-muted-foreground">Top 5% Clients</div>
-                      <div className="text-3xl font-semibold text-foreground leading-none mt-1">
-                        {atRiskCardMap.topFivePercent.totalClients}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <Crown size={16} className={atRiskFilter === "topFive" ? "text-primary" : "text-muted-foreground"} />
+                          <div className="truncate text-[13px] font-medium text-foreground">Top 5% Clients</div>
+                        </div>
+                        <div className={`flex flex-shrink-0 items-center gap-2 text-[12px] font-semibold ${atRiskFilter === "topFive" ? "text-primary" : "text-muted-foreground"}`}>
+                          <span>{atRiskCardMap.topFive.totalClients} users</span>
+                          <ChevronRight size={16} className={atRiskFilter === "topFive" ? "text-primary" : "text-muted-foreground"} />
+                        </div>
                       </div>
                     </button>
                   </div>
@@ -497,57 +566,81 @@ export function BusinessOpportunitiesCard() {
                     <button
                       type="button"
                       onClick={() => setActivationTableFilter("leads")}
-                      className={`w-full text-left rounded-md border px-3 py-2 transition-colors ${
+                      className={`w-full text-left rounded-md px-3 py-2 transition-colors ${
                         activationTableFilter === "leads"
-                          ? "border-primary bg-primary/5"
-                          : "border-border"
+                          ? "bg-primary/5"
+                          : "bg-background hover:bg-muted/30"
                       }`}
                     >
-                      <div className="text-xs text-muted-foreground">Leads</div>
-                      <div className="text-3xl font-semibold text-foreground leading-none mt-1">
-                        {ACTIVATION_SUMMARY.leads}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <Layers size={16} className={activationTableFilter === "leads" ? "text-primary" : "text-muted-foreground"} />
+                          <div className="truncate text-[13px] font-medium text-foreground">Leads</div>
+                        </div>
+                        <div className={`flex flex-shrink-0 items-center gap-2 text-[12px] font-semibold ${activationTableFilter === "leads" ? "text-primary" : "text-muted-foreground"}`}>
+                          <span>{ACTIVATION_SUMMARY.leads} users</span>
+                          <ChevronRight size={16} className={activationTableFilter === "leads" ? "text-primary" : "text-muted-foreground"} />
+                        </div>
                       </div>
                     </button>
                     <button
                       type="button"
                       onClick={() => setActivationTableFilter("onboarded")}
-                      className={`w-full text-left rounded-md border px-3 py-2 transition-colors ${
+                      className={`w-full text-left rounded-md px-3 py-2 transition-colors ${
                         activationTableFilter === "onboarded"
-                          ? "border-primary bg-primary/5"
-                          : "border-border"
+                          ? "bg-primary/5"
+                          : "bg-background hover:bg-muted/30"
                       }`}
                     >
-                      <div className="text-xs text-muted-foreground">Clients Onboarded</div>
-                      <div className="text-3xl font-semibold text-foreground leading-none mt-1">
-                        {ACTIVATION_SUMMARY.onboarded}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <UserPlus size={16} className={activationTableFilter === "onboarded" ? "text-primary" : "text-muted-foreground"} />
+                          <div className="truncate text-[13px] font-medium text-foreground">Clients Onboarded</div>
+                        </div>
+                        <div className={`flex flex-shrink-0 items-center gap-2 text-[12px] font-semibold ${activationTableFilter === "onboarded" ? "text-primary" : "text-muted-foreground"}`}>
+                          <span>{ACTIVATION_SUMMARY.onboarded} users</span>
+                          <ChevronRight size={16} className={activationTableFilter === "onboarded" ? "text-primary" : "text-muted-foreground"} />
+                        </div>
                       </div>
                     </button>
                     <button
                       type="button"
                       onClick={() => setActivationTableFilter("activated")}
-                      className={`w-full text-left rounded-md border px-3 py-2 transition-colors ${
+                      className={`w-full text-left rounded-md px-3 py-2 transition-colors ${
                         activationTableFilter === "activated"
-                          ? "border-primary bg-primary/5"
-                          : "border-border"
+                          ? "bg-primary/5"
+                          : "bg-background hover:bg-muted/30"
                       }`}
                     >
-                      <div className="text-xs text-muted-foreground">Clients Activated</div>
-                      <div className="text-3xl font-semibold text-foreground leading-none mt-1">
-                        {ACTIVATION_SUMMARY.activated}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <UserCheck size={16} className={activationTableFilter === "activated" ? "text-primary" : "text-muted-foreground"} />
+                          <div className="truncate text-[13px] font-medium text-foreground">Clients Activated</div>
+                        </div>
+                        <div className={`flex flex-shrink-0 items-center gap-2 text-[12px] font-semibold ${activationTableFilter === "activated" ? "text-primary" : "text-muted-foreground"}`}>
+                          <span>{ACTIVATION_SUMMARY.activated} users</span>
+                          <ChevronRight size={16} className={activationTableFilter === "activated" ? "text-primary" : "text-muted-foreground"} />
+                        </div>
                       </div>
                     </button>
                     <button
                       type="button"
                       onClick={() => setActivationTableFilter("notActivated")}
-                      className={`w-full text-left rounded-md border px-3 py-2 transition-colors ${
+                      className={`w-full text-left rounded-md px-3 py-2 transition-colors ${
                         activationTableFilter === "notActivated"
-                          ? "border-primary bg-primary/5"
-                          : "border-border"
+                          ? "bg-primary/5"
+                          : "bg-background hover:bg-muted/30"
                       }`}
                     >
-                      <div className="text-xs text-muted-foreground">Not Activated</div>
-                      <div className="text-3xl font-semibold text-primary leading-none mt-1">
-                        {ACTIVATION_SUMMARY.notActivated}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <UserMinus size={16} className={activationTableFilter === "notActivated" ? "text-primary" : "text-muted-foreground"} />
+                          <div className="truncate text-[13px] font-medium text-foreground">Not Activated</div>
+                        </div>
+                        <div className={`flex flex-shrink-0 items-center gap-2 text-[12px] font-semibold ${activationTableFilter === "notActivated" ? "text-primary" : "text-muted-foreground"}`}>
+                          <span>{ACTIVATION_SUMMARY.notActivated} users</span>
+                          <ChevronRight size={16} className={activationTableFilter === "notActivated" ? "text-primary" : "text-muted-foreground"} />
+                        </div>
                       </div>
                     </button>
                   </div>
@@ -736,147 +829,96 @@ export function BusinessOpportunitiesCard() {
                   </div>
 
                   <div className="p-3 space-y-2">
-                    <button
-                      type="button"
-                      onClick={() => setCrossSellFilter("fo")}
-                      className={`w-full text-left rounded-md border px-3 py-2 transition-colors ${
-                        crossSellFilter === "fo"
-                          ? "border-primary bg-primary/5"
-                          : "border-border"
-                      }`}
-                    >
-                      <div className="text-xs text-muted-foreground">F&O</div>
-                      <div className="text-3xl font-semibold text-foreground leading-none mt-1">
-                        {CROSS_SELL_SUMMARY.fo}
-                      </div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setCrossSellFilter("mfUpsell")}
-                      className={`w-full text-left rounded-md border px-3 py-2 transition-colors ${
-                        crossSellFilter === "mfUpsell"
-                          ? "border-primary bg-primary/5"
-                          : "border-border"
-                      }`}
-                    >
-                      <div className="text-xs text-muted-foreground">MF Upsell</div>
-                      <div className="text-3xl font-semibold text-foreground leading-none mt-1">
-                        {CROSS_SELL_SUMMARY.mfUpsell}
-                      </div>
-                    </button>
+                    {CROSS_SELL_CARDS.map((card) => {
+                      const isActive = crossSellFilter === card.id;
+                      const Icon =
+                        card.id === "equityPotential"
+                          ? BarChart3
+                          : card.id === "mtf"
+                            ? Layers
+                            : card.id === "fno"
+                              ? TrendingDown
+                              : card.id === "ipo"
+                                ? Crown
+                                : card.id === "intraday"
+                                  ? BarChart3
+                                  : Layers;
+                      return (
+                        <button
+                          key={card.id}
+                          type="button"
+                          onClick={() => setCrossSellFilter(card.id)}
+                          className={`w-full text-left rounded-md px-3 py-2 transition-colors ${
+                            isActive ? "bg-primary/5" : "bg-background hover:bg-muted/30"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <Icon size={16} className={isActive ? "text-primary" : "text-muted-foreground"} />
+                              <div className="truncate text-[13px] font-medium text-foreground">{card.title}</div>
+                            </div>
+                            <div className={`flex flex-shrink-0 items-center gap-2 text-[12px] font-semibold ${isActive ? "text-primary" : "text-muted-foreground"}`}>
+                              <span>{card.totalClients} users</span>
+                              <ChevronRight size={16} className={isActive ? "text-primary" : "text-muted-foreground"} />
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
                 <div className="w-[900px] rounded-md border border-border bg-card overflow-hidden">
                   <div className="px-3 py-2 border-b border-border bg-muted/20">
                     <div className="text-base font-semibold text-foreground">
-                      {crossSellFilter === "fo" ? "F&O Opportunities" : "MF Upsell Opportunities"}
+                      {activeCrossSellCard.title}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-[1fr_220px_130px] border-b border-border px-3 py-2">
+                    <div className="text-xs font-semibold text-muted-foreground">
+                      Client Name (UCC)
+                    </div>
+                    <div className="text-xs font-semibold text-muted-foreground text-right">
+                      {activeCrossSellCard.metricHeader}
+                    </div>
+                    <div className="text-xs font-semibold text-muted-foreground text-right">
+                      Suggested Action
                     </div>
                   </div>
 
-                  {crossSellFilter === "fo" ? (
-                    <>
-                      <div className="grid grid-cols-[1fr_170px_170px_130px] border-b border-border px-3 py-2">
-                        <div className="text-xs font-semibold text-muted-foreground">
-                          Client Name (UCC)
+                  <div className="max-h-[220px] overflow-auto">
+                    {activeCrossSellCard.clients.map((row) => (
+                      <div
+                        key={row.name}
+                        className="grid grid-cols-[1fr_220px_130px] px-3 py-2 border-b border-border last:border-b-0"
+                      >
+                        <div className="text-[13px] text-foreground truncate pr-2">
+                          {row.name}
                         </div>
-                        <div className="text-xs font-semibold text-muted-foreground text-right">
-                          Products Active In
+                        <div className="text-[13px] text-foreground text-right truncate">
+                          {row.metric}
                         </div>
-                        <div className="text-xs font-semibold text-muted-foreground text-right">
-                          F&O Segment
-                        </div>
-                        <div className="text-xs font-semibold text-muted-foreground text-right">
-                          Suggested Action
-                        </div>
-                      </div>
-
-                      <div className="max-h-[220px] overflow-auto">
-                        {CROSS_SELL_FO_ROWS.map((row) => (
-                          <div
-                            key={row.name}
-                            className="grid grid-cols-[1fr_170px_170px_130px] px-3 py-2 border-b border-border last:border-b-0"
+                        <div className="flex items-center justify-end gap-2 text-primary">
+                          <button
+                            type="button"
+                            aria-label={`WhatsApp ${row.name}`}
+                            title="WhatsApp"
+                            className="h-7 w-7 inline-flex items-center justify-center rounded-md border border-border hover:bg-primary/5 transition-colors"
                           >
-                            <div className="text-[13px] text-foreground truncate pr-2">
-                              {row.name}
-                            </div>
-                            <div className="text-[13px] text-foreground text-right truncate">
-                              {row.productsActiveIn}
-                            </div>
-                            <div className="text-[13px] text-foreground text-right">
-                              {row.segmentStatus}
-                            </div>
-                            <div className="flex items-center justify-end gap-2 text-primary">
-                              <button
-                                type="button"
-                                aria-label={`WhatsApp ${row.name}`}
-                                title="WhatsApp"
-                                className="h-7 w-7 inline-flex items-center justify-center rounded-md border border-border hover:bg-primary/5 transition-colors"
-                              >
-                                <MessageCircle size={15} />
-                              </button>
-                              <button
-                                type="button"
-                                aria-label={`Call ${row.name}`}
-                                title="Call"
-                                className="h-7 w-7 inline-flex items-center justify-center rounded-md border border-border hover:bg-primary/5 transition-colors"
-                              >
-                                <Phone size={15} />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="grid grid-cols-[1fr_220px_130px] border-b border-border px-3 py-2">
-                        <div className="text-xs font-semibold text-muted-foreground">
-                          Client Name (UCC)
-                        </div>
-                        <div className="text-xs font-semibold text-muted-foreground text-right">
-                          Products Active In
-                        </div>
-                        <div className="text-xs font-semibold text-muted-foreground text-right">
-                          Suggested Action
-                        </div>
-                      </div>
-
-                      <div className="max-h-[220px] overflow-auto">
-                        {CROSS_SELL_MF_ROWS.map((row) => (
-                          <div
-                            key={row.name}
-                            className="grid grid-cols-[1fr_220px_130px] px-3 py-2 border-b border-border last:border-b-0"
+                            <MessageCircle size={15} />
+                          </button>
+                          <button
+                            type="button"
+                            aria-label={`Call ${row.name}`}
+                            title="Call"
+                            className="h-7 w-7 inline-flex items-center justify-center rounded-md border border-border hover:bg-primary/5 transition-colors"
                           >
-                            <div className="text-[13px] text-foreground truncate pr-2">
-                              {row.name}
-                            </div>
-                            <div className="text-[13px] text-foreground text-right truncate">
-                              {row.productsActiveIn}
-                            </div>
-                            <div className="flex items-center justify-end gap-2 text-primary">
-                              <button
-                                type="button"
-                                aria-label={`WhatsApp ${row.name}`}
-                                title="WhatsApp"
-                                className="h-7 w-7 inline-flex items-center justify-center rounded-md border border-border hover:bg-primary/5 transition-colors"
-                              >
-                                <MessageCircle size={15} />
-                              </button>
-                              <button
-                                type="button"
-                                aria-label={`Call ${row.name}`}
-                                title="Call"
-                                className="h-7 w-7 inline-flex items-center justify-center rounded-md border border-border hover:bg-primary/5 transition-colors"
-                              >
-                                <Phone size={15} />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
+                            <Phone size={15} />
+                          </button>
+                        </div>
                       </div>
-                    </>
-                  )}
+                    ))}
+                  </div>
 
                   <div className="px-3 py-2 border-t border-border flex justify-end">
                     <button

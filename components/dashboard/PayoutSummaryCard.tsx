@@ -112,7 +112,7 @@ export function PayoutSummaryCard() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold text-foreground tracking-tight">
-              Payout Summary
+              Revenue Summary
             </h2>
           </div>
 
