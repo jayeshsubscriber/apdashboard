@@ -401,7 +401,7 @@ export function BusinessOverview() {
           </div>
         </div>
 
-        <section className="mt-5 w-3/4">
+        <section className="mt-5 w-full">
           <div className="mb-4">
             <h3 className="text-base font-semibold tracking-tight text-foreground">AUM Summary</h3>
           </div>
@@ -490,7 +490,7 @@ export function BusinessOverview() {
               <div
                 className={
                   activeAumTab === "mutualFunds"
-                    ? "grid grid-cols-[minmax(0,1fr)_260px] gap-3"
+                    ? "grid grid-cols-[minmax(0,1fr)_260px] gap-3 items-start"
                     : "block"
                 }
               >
