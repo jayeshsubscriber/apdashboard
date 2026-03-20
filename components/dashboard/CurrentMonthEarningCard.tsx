@@ -25,7 +25,7 @@ export function CurrentMonthEarningCard() {
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-4 gap-x-6 gap-y-2">
+        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-4">
           <div>
             <div className="text-sm text-muted-foreground font-medium">
               Number of Accounts Opened

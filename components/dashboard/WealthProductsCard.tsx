@@ -454,48 +454,52 @@ export function WealthProductsCard() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-[minmax(180px,0.9fr)_180px_145px_145px_110px_200px] border-b border-border px-3 py-2 gap-x-2">
-                <div className="text-xs font-semibold text-muted-foreground">Name</div>
-                <div className="text-xs font-semibold text-muted-foreground text-right">Open/Close</div>
-                <div className="text-xs font-semibold text-muted-foreground text-right">Issue Size</div>
-                <div className="text-xs font-semibold text-muted-foreground text-right">Price Range</div>
-                <div className="text-xs font-semibold text-muted-foreground text-right">Subscription</div>
-                <div className="text-xs font-semibold text-muted-foreground text-right">Actions</div>
-              </div>
-
-              <div className="max-h-[240px] overflow-auto">
-                {ipoRows.map((row) => (
-                  <div
-                    key={row.name}
-                    className="grid grid-cols-[minmax(180px,0.9fr)_180px_145px_145px_110px_200px] gap-x-2 px-3 py-2 border-b border-border last:border-b-0"
-                  >
-                    <div className="pr-2">
-                      <div className="text-[13px] text-foreground truncate">{row.name}</div>
-                      <div className="text-[11px] text-muted-foreground truncate">{row.marketType}</div>
-                    </div>
-                    <div className="text-[13px] text-foreground text-right whitespace-nowrap">{row.openClose}</div>
-                    <div className="text-[13px] text-foreground text-right whitespace-nowrap">{row.issueSize}</div>
-                    <div className="text-[13px] text-foreground text-right whitespace-nowrap">{row.priceRange}</div>
-                    <div className="text-[13px] text-foreground text-right whitespace-nowrap">{row.subscription}</div>
-                    <div className="flex items-center justify-end gap-2">
-                      <a
-                        href={UPSTOX_IPO_URL}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex h-7 items-center justify-center rounded-md border border-primary px-2.5 text-[11px] font-semibold text-primary transition-colors hover:bg-primary/5 whitespace-nowrap"
-                      >
-                        View Details
-                      </a>
-                      <button
-                        type="button"
-                        className="h-7 rounded-md border border-primary/30 bg-primary/10 px-2 text-xs font-medium text-primary inline-flex items-center gap-1 hover:bg-primary/15 transition-colors"
-                      >
-                        <Share2 size={12} />
-                        Share
-                      </button>
-                    </div>
+              <div className="overflow-x-auto">
+                <div className="min-w-[780px]">
+                  <div className="grid grid-cols-[minmax(180px,0.9fr)_180px_145px_145px_110px_200px] border-b border-border px-3 py-2 gap-x-2">
+                    <div className="text-xs font-semibold text-muted-foreground">Name</div>
+                    <div className="text-xs font-semibold text-muted-foreground text-right">Open/Close</div>
+                    <div className="text-xs font-semibold text-muted-foreground text-right">Issue Size</div>
+                    <div className="text-xs font-semibold text-muted-foreground text-right">Price Range</div>
+                    <div className="text-xs font-semibold text-muted-foreground text-right">Subscription</div>
+                    <div className="text-xs font-semibold text-muted-foreground text-right">Actions</div>
                   </div>
-                ))}
+
+                  <div className="max-h-[240px] overflow-y-auto">
+                    {ipoRows.map((row) => (
+                      <div
+                        key={row.name}
+                        className="grid grid-cols-[minmax(180px,0.9fr)_180px_145px_145px_110px_200px] gap-x-2 px-3 py-2 border-b border-border last:border-b-0"
+                      >
+                        <div className="pr-2">
+                          <div className="text-[13px] text-foreground truncate">{row.name}</div>
+                          <div className="text-[11px] text-muted-foreground truncate">{row.marketType}</div>
+                        </div>
+                        <div className="text-[13px] text-foreground text-right whitespace-nowrap">{row.openClose}</div>
+                        <div className="text-[13px] text-foreground text-right whitespace-nowrap">{row.issueSize}</div>
+                        <div className="text-[13px] text-foreground text-right whitespace-nowrap">{row.priceRange}</div>
+                        <div className="text-[13px] text-foreground text-right whitespace-nowrap">{row.subscription}</div>
+                        <div className="flex items-center justify-end gap-2">
+                          <a
+                            href={UPSTOX_IPO_URL}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex h-7 items-center justify-center rounded-md border border-primary px-2.5 text-[11px] font-semibold text-primary transition-colors hover:bg-primary/5 whitespace-nowrap"
+                          >
+                            View Details
+                          </a>
+                          <button
+                            type="button"
+                            className="h-7 rounded-md border border-primary/30 bg-primary/10 px-2 text-xs font-medium text-primary inline-flex items-center gap-1 hover:bg-primary/15 transition-colors"
+                          >
+                            <Share2 size={12} />
+                            Share
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -530,7 +534,8 @@ export function WealthProductsCard() {
                 </button>
               </div>
 
-              <div className="max-h-[300px] overflow-auto p-3 space-y-2">
+              <div className="overflow-x-auto">
+              <div className="max-h-[300px] overflow-y-auto p-3 space-y-2 min-w-[780px]">
                 {mfRows.map((row) => (
                   <div
                     key={row.name}
@@ -593,6 +598,7 @@ export function WealthProductsCard() {
                     </div>
                   </div>
                 ))}
+              </div>
               </div>
             </div>
             <div className="mt-2 text-xs text-muted-foreground">

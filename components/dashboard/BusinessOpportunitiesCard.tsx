@@ -369,15 +369,15 @@ export function BusinessOpportunitiesCard() {
           Business Opportunities
         </h2>
 
-        <div className="mt-3 grid grid-cols-12 gap-4">
-          <div className="col-span-7">
-            <div className="flex items-center gap-6 border-b border-border">
+        <div className="mt-3">
+          <div>
+            <div className="flex items-center gap-4 border-b border-border overflow-x-auto">
               {MAIN_TABS.map((tab) => (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveNavTab(tab.id)}
-                  className={`pb-2 text-[15px] font-medium transition-colors border-b-2 outline-none ${
+                  className={`pb-2 text-[15px] font-medium transition-colors border-b-2 outline-none whitespace-nowrap shrink-0 ${
                     activeNavTab === tab.id
                       ? "text-primary border-primary"
                       : "text-muted-foreground border-transparent hover:text-foreground"

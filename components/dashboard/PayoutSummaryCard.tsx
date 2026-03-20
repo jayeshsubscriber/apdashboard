@@ -109,14 +109,14 @@ export function PayoutSummaryCard() {
   return (
     <section className="rounded-md border border-border bg-card overflow-hidden min-h-[340px]">
       <div className="p-5">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold text-foreground tracking-tight">
               Revenue Summary
             </h2>
           </div>
 
-          <div className="shrink-0 flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3 sm:shrink-0">
             <label className="inline-flex items-center gap-2 text-sm text-muted-foreground cursor-pointer select-none">
               <input
                 type="checkbox"
@@ -131,7 +131,7 @@ export function PayoutSummaryCard() {
               aria-label="Time interval"
               value={rangeId}
               onChange={(e) => setRangeId(e.target.value as RangeId)}
-              className="h-10 rounded-md border border-border bg-card px-4 text-sm text-muted-foreground outline-none focus-visible:ring-1 focus-visible:ring-primary"
+              className="h-9 rounded-md border border-border bg-card px-3 text-sm text-muted-foreground outline-none focus-visible:ring-1 focus-visible:ring-primary"
             >
               {RANGE_OPTIONS.map((opt) => (
                 <option key={opt.id} value={opt.id}>

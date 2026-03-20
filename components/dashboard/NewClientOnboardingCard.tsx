@@ -117,7 +117,7 @@ export function NewClientOnboardingCard() {
         </div>
 
         {/* Two inner sections */}
-        <div className="mt-4 grid grid-cols-2 gap-5">
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* Left: Account status summary */}
           <div className="rounded-md border border-border bg-card p-4">
             <h3 className="text-base font-semibold text-foreground tracking-tight">
