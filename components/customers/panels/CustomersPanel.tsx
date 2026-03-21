@@ -12,7 +12,9 @@ import {
 import { customerInsights, customerRows } from "../data";
 import { useMemo, useState } from "react";
 
-export function CustomersPanel() {
+type Props = { onSelectCustomer: (ucc: string) => void };
+
+export function CustomersPanel({ onSelectCustomer }: Props) {
   const pageSize = 20;
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
@@ -138,6 +140,7 @@ export function CustomersPanel() {
                 <div className="flex items-start gap-2">
                   <button
                     type="button"
+                    onClick={() => onSelectCustomer(r.ucc)}
                     className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border hover:bg-primary/5"
                     aria-label="View customer"
                   >

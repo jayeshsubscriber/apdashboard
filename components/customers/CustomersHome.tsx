@@ -11,7 +11,9 @@ const SECTION_TABS = [
   { id: "business-opportunities", label: "Business Opportunities" },
 ] as const;
 
-export function CustomersHome() {
+type Props = { onSelectCustomer: (ucc: string) => void };
+
+export function CustomersHome({ onSelectCustomer }: Props) {
   const [activeTab, setActiveTab] = useState<(typeof SECTION_TABS)[number]["id"]>(SECTION_TABS[0].id);
 
   useEffect(() => {
@@ -76,7 +78,7 @@ export function CustomersHome() {
           <BusinessOpportunitiesPanel />
         </section>
         <section id="customers" className="scroll-mt-24 md:scroll-mt-16">
-          <CustomersPanel />
+          <CustomersPanel onSelectCustomer={onSelectCustomer} />
         </section>
       </section>
     </main>

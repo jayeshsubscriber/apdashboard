@@ -2,13 +2,18 @@
 
 import { useMemo, useState } from "react";
 import {
+  AlertTriangle,
   BarChart3,
   CalendarClock,
   CircleDollarSign,
+  CircleOff,
+  IndianRupee,
   Landmark,
   TrendingUp,
   UserCheck,
+  UserRoundCheck,
   Users,
+  UserX,
   Wallet,
 } from "lucide-react";
 import {
@@ -53,17 +58,11 @@ type AumSummaryMetric = {
   label: string;
   value: string;
 };
-type MfQuickviewMetric = {
-  id: string;
-  label: string;
-  value: string;
-};
 type AumConfig = {
   totalLabel: string;
   segments: AumSegmentRow[];
   summaryMonth: string;
   summaryMetrics: AumSummaryMetric[];
-  mfQuickviewMetrics?: MfQuickviewMetric[];
 };
 
 const EQUITY_STATS: EquityStatRow[] = [
@@ -145,6 +144,12 @@ const AUM_CONFIG_BY_TAB: Record<AumTabId, AumConfig> = {
       { label: "AUM", value: "Rs 4,21,674 (+7.89%)" },
       { label: "Equity Traded", value: "270 (+12.40%)" },
       { label: "F&O Traded", value: "118 (+9.25%)" },
+      { label: "Total Clients", value: "1870" },
+      { label: "Active Clients", value: "1393" },
+      { label: "Inactive", value: "476" },
+      { label: "Traded", value: "1268" },
+      { label: "Never traded", value: "602" },
+      { label: "Clients near churn", value: "29" },
     ],
   },
   mutualFunds: {
@@ -174,19 +179,63 @@ const AUM_CONFIG_BY_TAB: Record<AumTabId, AumConfig> = {
       { label: "AUM", value: "Rs 2,86,940 (+9.32%)" },
       { label: "Addition Rate", value: "10.90 %" },
       { label: "Withdrawal Rate", value: "14.11 %" },
-    ],
-    mfQuickviewMetrics: [
-      { id: "totalMfClients", label: "Total MF Clients", value: "1,870" },
-      { id: "clientsWithSips", label: "Clients with SIPs", value: "64" },
-      { id: "totalActiveSips", label: "Total Active SIPs", value: "166" },
-      { id: "sipInputValue", label: "SIP Input Value", value: "Rs 2,73,659" },
-      { id: "upcomingSips7Days", label: "Upcoming SIPs in next 7 days", value: "83" },
+      { label: "Total MF Clients", value: "1,870" },
+      { label: "Clients with SIPs", value: "64" },
+      { label: "Total Active SIPs", value: "166" },
+      { label: "SIP Input Value", value: "₹2,73,659" },
+      { label: "Upcoming SIPs in next 7 days", value: "83" },
     ],
   },
 };
 
 function formatNumber(value: number) {
   return value.toLocaleString("en-IN");
+}
+
+function SummaryMetricIcon({ label }: { label: string }) {
+  const size = 15;
+  const cls = "shrink-0 text-primary";
+
+  switch (label) {
+    case "AUM":
+      return <Landmark size={size} className={cls} aria-hidden />;
+    case "Equity Traded":
+      return <BarChart3 size={size} className={cls} aria-hidden />;
+    case "F&O Traded":
+      return <TrendingUp size={size} className={cls} aria-hidden />;
+    case "Total Clients":
+    case "Total MF Clients":
+      return <Users size={size} className={cls} aria-hidden />;
+    case "Active Clients":
+      return <UserCheck size={size} className={cls} aria-hidden />;
+    case "Inactive":
+      return <UserX size={size} className={cls} aria-hidden />;
+    case "Traded":
+      return <TrendingUp size={size} className={cls} aria-hidden />;
+    case "Never traded":
+      return <CircleOff size={size} className={cls} aria-hidden />;
+    case "Clients near churn":
+      return <AlertTriangle size={size} className={cls} aria-hidden />;
+    case "Addition Rate":
+    case "Total Active SIPs":
+      return <CircleDollarSign size={size} className={cls} aria-hidden />;
+    case "Withdrawal Rate":
+      return <Wallet size={size} className={cls} aria-hidden />;
+    case "Clients with SIPs":
+      return <UserRoundCheck size={size} className={cls} aria-hidden />;
+    case "SIP Input Value":
+      return <IndianRupee size={size} className={cls} aria-hidden />;
+    case "Upcoming SIPs in next 7 days":
+      return <CalendarClock size={size} className={cls} aria-hidden />;
+    case "MTF Traded":
+    case "Fund Withdrawals":
+    case "Fund Additions":
+    case "Clients Traded":
+    case "AUM Growth Rate":
+      return <Landmark size={size} className={cls} aria-hidden />;
+    default:
+      return null;
+  }
 }
 
 export function BusinessOverview() {
@@ -431,7 +480,7 @@ export function BusinessOverview() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
             <div className="lg:col-span-7 rounded-md border border-border bg-card px-2.5 pb-2 pt-2">
               <div className="mb-1 text-base font-semibold tracking-tight text-foreground">
-                AUM Overview
+                {activeAumTab === "equity" ? "Equity AUM Overview" : "Mutual Funds AUM Overview"}
               </div>
               {/* Keep legend inside card so labels remain fully visible */}
               <div className="h-[248px] overflow-visible">
@@ -487,99 +536,36 @@ export function BusinessOverview() {
             </div>
 
             <div className="lg:col-span-5">
-              <div
-                className={
-                  activeAumTab === "mutualFunds"
-                    ? "grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] gap-3 items-start"
-                    : "block"
-                }
-              >
-                <div className="rounded-md border border-border bg-card p-3">
-                  <div className="mb-2 text-sm font-semibold text-foreground">
-                    Summary - {activeAumConfig.summaryMonth}
-                  </div>
-
-                  <div className="space-y-2.5">
-                    {activeAumConfig.summaryMetrics.map((metric) => (
-                      <div key={metric.label} className="rounded-md border border-border bg-muted/20 p-3">
-                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                          {metric.label === "Equity Traded" && (
-                            <BarChart3 size={14} className="text-muted-foreground" />
-                          )}
-                          {metric.label === "F&O Traded" && (
-                            <TrendingUp size={14} className="text-muted-foreground" />
-                          )}
-                          {metric.label === "MTF Traded" && (
-                            <Landmark size={14} className="text-muted-foreground" />
-                          )}
-                          {metric.label === "Withdrawal Rate" && (
-                            <Wallet size={14} className="text-muted-foreground" />
-                          )}
-                          {metric.label === "Fund Withdrawals" && (
-                            <Wallet size={14} className="text-muted-foreground" />
-                          )}
-                          {metric.label === "Addition Rate" && (
-                            <CircleDollarSign size={14} className="text-muted-foreground" />
-                          )}
-                          {metric.label === "Fund Additions" && (
-                            <CircleDollarSign size={14} className="text-muted-foreground" />
-                          )}
-                          {metric.label === "Clients Traded" && (
-                            <BarChart3 size={14} className="text-muted-foreground" />
-                          )}
-                          {metric.label === "AUM" && <Landmark size={14} className="text-muted-foreground" />}
-                          {metric.label === "AUM Growth Rate" && (
-                            <Landmark size={14} className="text-muted-foreground" />
-                          )}
-                          <span>{metric.label}</span>
-                        </div>
-                        <div className="mt-1 flex items-center gap-1.5 text-xl font-semibold">
-                          <span className="text-foreground">{metric.value}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+              <div className="rounded-md border border-border bg-card p-3">
+                <div className="mb-2 text-sm font-semibold text-foreground">
+                  Summary - {activeAumConfig.summaryMonth}
                 </div>
 
-                {activeAumTab === "mutualFunds" && activeAumConfig.mfQuickviewMetrics && (
-                  <aside className="rounded-md border border-border bg-card p-3">
-                    <div className="mb-2 text-sm font-semibold text-foreground">Quickview</div>
-                    <div className="grid grid-cols-2 divide-x divide-y rounded-md border border-border">
-                      {activeAumConfig.mfQuickviewMetrics.map((metric, idx) => (
-                        <article
-                          key={metric.id}
-                          className={`flex flex-col items-start gap-1.5 p-2.5 min-h-[74px] ${
-                            idx === activeAumConfig.mfQuickviewMetrics!.length - 1
-                              ? "col-span-2"
-                              : ""
-                          }`}
-                        >
-                          <div className="flex items-center gap-1.5 text-xs font-medium leading-none text-muted-foreground">
-                            {metric.id === "totalMfClients" && (
-                              <Users size={15} className="text-primary" aria-hidden />
-                            )}
-                            {metric.id === "clientsWithSips" && (
-                              <UserCheck size={15} className="text-primary" aria-hidden />
-                            )}
-                            {metric.id === "totalActiveSips" && (
-                              <BarChart3 size={15} className="text-primary" aria-hidden />
-                            )}
-                            {metric.id === "sipInputValue" && (
-                              <CircleDollarSign size={15} className="text-primary" aria-hidden />
-                            )}
-                            {metric.id === "upcomingSips7Days" && (
-                              <CalendarClock size={15} className="text-primary" aria-hidden />
-                            )}
-                            <span>{metric.label}</span>
-                          </div>
-                          <div className="text-xl font-semibold leading-none text-foreground">
-                            {metric.value}
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-                  </aside>
-                )}
+                <div className="grid grid-cols-1 min-[420px]:grid-cols-3 overflow-hidden rounded-md border border-border divide-x divide-y divide-border">
+                  {activeAumConfig.summaryMetrics.map((metric) => (
+                    <article
+                      key={metric.label}
+                      className="flex min-h-[74px] flex-col items-start gap-2.5 p-2.5"
+                    >
+                      <div className="flex items-center gap-1.5 text-xs font-medium leading-none text-muted-foreground">
+                        <SummaryMetricIcon label={metric.label} />
+                        <span>{metric.label}</span>
+                      </div>
+                      <div className="text-lg font-semibold leading-tight text-foreground min-[420px]:text-xl min-[420px]:leading-none">
+                        {metric.value}
+                      </div>
+                    </article>
+                  ))}
+                  {activeAumConfig.summaryMetrics.length % 3 === 1 && (
+                    <>
+                      <div aria-hidden className="min-h-[74px] hidden min-[420px]:block" />
+                      <div aria-hidden className="min-h-[74px] hidden min-[420px]:block" />
+                    </>
+                  )}
+                  {activeAumConfig.summaryMetrics.length % 3 === 2 && (
+                    <div aria-hidden className="min-h-[74px] hidden min-[420px]:block" />
+                  )}
+                </div>
               </div>
             </div>
           </div>

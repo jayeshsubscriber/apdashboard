@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Header } from "@/components/header/Header";
 import { DashboardHome } from "@/components/dashboard/DashboardHome";
 import { CustomersHome } from "@/components/customers/CustomersHome";
+import { CustomerDetailView } from "@/components/customers/CustomerDetailView";
 import { BusinessOverview } from "@/components/business/BusinessOverview";
 
 type TabId = "dashboard" | "customers" | "business";
@@ -28,12 +29,18 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<TabId>("dashboard");
   const [activeBusinessPill, setActiveBusinessPill] =
     useState<BusinessPill>("Overview");
+  const [selectedCustomerUcc, setSelectedCustomerUcc] = useState<string | null>(null);
+
+  const handleTabChange = (tab: TabId) => {
+    setActiveTab(tab);
+    if (tab !== "customers") setSelectedCustomerUcc(null);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         partnerName="Rajesh Sharma"
       />
 
@@ -61,7 +68,15 @@ export default function Home() {
       )}
 
       {activeTab === "dashboard" && <DashboardHome />}
-      {activeTab === "customers" && <CustomersHome />}
+      {activeTab === "customers" &&
+        (selectedCustomerUcc ? (
+          <CustomerDetailView
+            ucc={selectedCustomerUcc}
+            onBack={() => setSelectedCustomerUcc(null)}
+          />
+        ) : (
+          <CustomersHome onSelectCustomer={setSelectedCustomerUcc} />
+        ))}
       {activeTab === "business" &&
         (activeBusinessPill === "Overview" ? (
           <BusinessOverview />
