@@ -8,7 +8,7 @@ import { EarningPotentialCard } from "./EarningPotentialCard";
 
 export function DashboardHome() {
   return (
-    <main className="flex-1 p-4">
+    <main className="flex-1 py-3">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         <div className="lg:col-span-9 flex flex-col gap-3">
           <CurrentMonthEarningCard />

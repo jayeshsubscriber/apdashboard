@@ -205,7 +205,7 @@ export function Header({
         <div className="flex items-center gap-3 md:gap-4 shrink-0 ml-auto md:ml-0">
           <button className="relative text-white/80 hover:text-white transition-colors shrink-0">
             <Bell size={19} />
-            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-orange-400 text-[10px] font-bold text-white flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-orange-400 text-[9px] font-bold text-white flex items-center justify-center">
               3
             </span>
           </button>

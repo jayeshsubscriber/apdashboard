@@ -17,10 +17,10 @@ export function CurrentMonthEarningCard() {
 
   return (
     <section className="min-w-0 overflow-hidden">
-      <div className="p-4">
+      <div className="px-3 sm:px-5 py-4 sm:py-5">
         <div className="flex items-start">
           <div>
-            <h2 className="flex items-center gap-2 border-l-[3px] border-primary pl-3 text-base font-semibold text-foreground">
+            <h2 className="flex items-center gap-2 border-l-[3px] border-primary pl-3 text-lg font-semibold text-foreground tracking-tight">
               <IndianRupee size={16} className="text-primary shrink-0" />
               MTD Summary
             </h2>

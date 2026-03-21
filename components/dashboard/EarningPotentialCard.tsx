@@ -20,7 +20,7 @@ export function EarningPotentialCard() {
 
   return (
     <section className="min-w-0 overflow-hidden">
-      <div className="px-5 pt-4 pb-1">
+      <div className="px-3 sm:px-5 pt-4 pb-1">
         <h2 className="flex items-center gap-2 border-l-[3px] border-primary pl-3 text-lg font-semibold text-foreground tracking-tight">
           Grow Your Income
         </h2>
@@ -29,11 +29,11 @@ export function EarningPotentialCard() {
         </p>
       </div>
 
-      <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {/* Card 1 — Account Opening Referral */}
-        <div className="rounded-xl border border-border bg-card p-5 flex flex-col gap-4">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-600 mb-3">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-3">
               Account Opening
             </div>
             <h3 className="text-base font-semibold text-foreground">
@@ -82,9 +82,9 @@ export function EarningPotentialCard() {
         </div>
 
         {/* Card 2 — Brokerage Sharing */}
-        <div className="rounded-xl border border-border bg-card p-5 flex flex-col gap-4">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-600 mb-3">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-3">
               Brokerage
             </div>
             <h3 className="text-base font-semibold text-foreground">
@@ -107,9 +107,9 @@ export function EarningPotentialCard() {
         </div>
 
         {/* Card 3 — Mutual Funds */}
-        <div className="rounded-xl border border-border bg-card p-5 flex flex-col gap-4">
+        <div className="rounded-xl border border-border bg-card p-4 sm:p-5 flex flex-col gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-600 mb-3">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-3">
               Mutual Funds
             </div>
             <h3 className="text-base font-semibold text-foreground">
@@ -126,14 +126,14 @@ export function EarningPotentialCard() {
 
           <div className="mt-auto">
             <div className="mb-3 grid grid-cols-2 gap-2">
-              <div className="rounded-lg bg-cyan-50 border border-cyan-100 px-3 py-2.5">
+              <div className="rounded-lg bg-primary/5 border border-primary/10 px-3 py-2.5">
                 <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Equity Funds</p>
-                <p className="mt-0.5 text-sm font-bold text-cyan-700">Upto 0.8%</p>
+                <p className="mt-0.5 text-sm font-bold text-primary">Upto 0.8%</p>
                 <p className="text-[10px] text-muted-foreground">of AUM / yr</p>
               </div>
-              <div className="rounded-lg bg-cyan-50 border border-cyan-100 px-3 py-2.5">
+              <div className="rounded-lg bg-primary/5 border border-primary/10 px-3 py-2.5">
                 <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Debt Funds</p>
-                <p className="mt-0.5 text-sm font-bold text-cyan-700">Upto 0.4%</p>
+                <p className="mt-0.5 text-sm font-bold text-primary">Upto 0.4%</p>
                 <p className="text-[10px] text-muted-foreground">of AUM / yr</p>
               </div>
             </div>

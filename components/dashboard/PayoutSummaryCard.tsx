@@ -1,6 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+
+function useIsNarrow(breakpoint = 640) {
+  const [narrow, setNarrow] = useState(false);
+  useEffect(() => {
+    const check = () => setNarrow(window.innerWidth < breakpoint);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, [breakpoint]);
+  return narrow;
+}
 import { BarChart3 } from "lucide-react";
 import {
   Bar,
@@ -112,6 +123,7 @@ function formatMoney(v: number) {
 }
 
 export function PayoutSummaryCard() {
+  const isMobile = useIsNarrow(640);
   const [rangeId, setRangeId] = useState<RangeId>("last6");
   const [showConsolidatedIncome, setShowConsolidatedIncome] = useState(false);
   const range = useMemo(
@@ -148,7 +160,7 @@ export function PayoutSummaryCard() {
 
   return (
     <section className="min-w-0 overflow-hidden">
-      <div className="p-5">
+      <div className="px-3 sm:px-5 py-4 sm:py-5">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
           <div>
             <h2 className="flex items-center gap-2 border-l-[3px] border-primary pl-3 text-lg font-semibold text-foreground tracking-tight">
@@ -187,8 +199,8 @@ export function PayoutSummaryCard() {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data}
-              margin={{ top: 20, right: 18, left: 0, bottom: 0 }}
-              barGap={6}
+              margin={isMobile ? { top: 10, right: 4, left: 0, bottom: 0 } : { top: 20, right: 18, left: 0, bottom: 0 }}
+              barGap={isMobile ? 3 : 6}
               barCategoryGap="15%"
             >
               <CartesianGrid
@@ -212,8 +224,8 @@ export function PayoutSummaryCard() {
               <YAxis
                 tickLine={false}
                 axisLine={false}
-                width={52}
-                tick={{ fontSize: 14, fill: "#6b7280" }}
+                width={isMobile ? 38 : 52}
+                tick={{ fontSize: isMobile ? 10 : 12, fill: "#6b7280" }}
                 domain={[0, chartMax]}
                 tickFormatter={formatMoney}
               />

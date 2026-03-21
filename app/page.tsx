@@ -47,7 +47,7 @@ export default function Home() {
       />
 
       {activeTab === "business" && (
-        <div className="px-4 pt-4">
+        <div className="px-3 sm:px-4 pt-3">
           <div className="flex w-full items-center gap-2 overflow-x-auto">
             {BUSINESS_PILLS.map((pill) => {
               const isActive = pill === activeBusinessPill;

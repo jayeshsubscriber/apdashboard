@@ -79,7 +79,7 @@ export function ClientOnboardingLeadsPanel() {
   const showRejectedColumns = activeStatus === "Rejected";
 
   return (
-    <section className="p-3">
+    <section className="px-3 py-3">
       <div className="px-0 py-0">
         <h3 className="flex items-center gap-2 border-l-[3px] border-primary pl-3 text-lg font-semibold tracking-tight text-foreground">
           <UserPlus size={18} className="text-primary shrink-0" />
@@ -95,7 +95,7 @@ export function ClientOnboardingLeadsPanel() {
             onClick={() => setActiveStep(null)}
             className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-medium transition-colors shrink-0 ${
               activeStep === null
-                ? "border-primary bg-primary/10 text-primary"
+                ? "border-primary bg-primary text-primary-foreground"
                 : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
@@ -110,7 +110,7 @@ export function ClientOnboardingLeadsPanel() {
                 onClick={() => handleStepClick(step.id)}
                 className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-medium transition-colors shrink-0 ${
                   isSelected
-                    ? "border-primary bg-primary/10 text-primary"
+                    ? "border-primary bg-primary text-primary-foreground"
                     : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
@@ -139,7 +139,7 @@ export function ClientOnboardingLeadsPanel() {
                   onClick={() => handleStepClick(step.id)}
                   className={`w-full text-left rounded-md px-3 py-2 transition-colors ${
                     isSelected
-                      ? "bg-primary/5"
+                      ? "bg-primary/10"
                       : "bg-background hover:bg-muted/30"
                   }`}
                 >
@@ -193,7 +193,73 @@ export function ClientOnboardingLeadsPanel() {
               ))}
             </select>
           </div>
-          <div className="max-w-full overflow-x-auto">
+          {/* ── Mobile card view (< md) ─────────────────────────────── */}
+          <div className="md:hidden divide-y divide-border">
+            {timeFilteredRows.map((r) => (
+              <div key={r.id} className="px-3 py-3 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="text-sm font-semibold text-foreground">{r.name}</div>
+                    <div className="text-xs text-muted-foreground truncate">{r.email}</div>
+                  </div>
+                  <span className="shrink-0 inline-flex rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                    {r.status}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>{revealedPhones[r.id] ? r.phoneNumber : maskPhone(r.phoneNumber)}</span>
+                  <button
+                    type="button"
+                    onClick={() => togglePhoneVisibility(r.id)}
+                    className="text-muted-foreground hover:text-foreground"
+                    aria-label={revealedPhones[r.id] ? "Hide phone number" : "Show phone number"}
+                  >
+                    {revealedPhones[r.id] ? <EyeOff size={13} /> : <Eye size={13} />}
+                  </button>
+                </div>
+                <div className="flex flex-wrap items-center gap-1">
+                  {r.selectedSegments.map((segment) => (
+                    <span
+                      key={`${r.id}-${segment}`}
+                      className="inline-flex rounded-sm border border-border bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-foreground"
+                    >
+                      {segment}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-xs text-muted-foreground">
+                    {showRejectedColumns
+                      ? r.rejectedReason ?? "-"
+                      : `Step ${r.currentStep}: ${onboardingSteps.find((s) => s.id === r.currentStep)?.title ?? "N/A"}`}
+                  </div>
+                  {showRejectedColumns || r.status === "Scrutiny" ? (
+                    <button type="button" className="shrink-0 text-xs font-semibold text-primary hover:underline">
+                      View
+                    </button>
+                  ) : (
+                    <a
+                      href={COMPLETE_APPLICATION_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                    >
+                      View <ChevronRight size={12} />
+                    </a>
+                  )}
+                </div>
+                <div className="text-[10px] text-muted-foreground">{r.dateCreated}</div>
+              </div>
+            ))}
+            {timeFilteredRows.length === 0 && (
+              <div className="px-3 py-8 text-center text-sm text-muted-foreground">
+                No users found for selected step and status.
+              </div>
+            )}
+          </div>
+
+          {/* ── Desktop table (md+) ─────────────────────────────────── */}
+          <div className="hidden md:block max-w-full overflow-x-auto">
             <div
               className={`grid border-b border-border bg-muted/20 px-3 py-2 text-xs font-semibold text-muted-foreground ${
                 showRejectedColumns
@@ -214,7 +280,7 @@ export function ClientOnboardingLeadsPanel() {
             {timeFilteredRows.map((r) => (
               <div
                 key={r.id}
-                className={`grid border-b border-border px-3 py-2 text-[13px] last:border-b-0 ${
+                className={`grid border-b border-border px-3 py-2 text-sm last:border-b-0 ${
                   showRejectedColumns
                     ? "grid-cols-[140px_140px_180px_220px_150px_220px_110px_170px_150px]"
                     : "grid-cols-[140px_140px_180px_220px_150px_220px_110px_140px_170px_150px]"
@@ -239,7 +305,7 @@ export function ClientOnboardingLeadsPanel() {
                   {r.selectedSegments.map((segment) => (
                     <span
                       key={`${r.id}-${segment}`}
-                      className="inline-flex rounded-sm border border-border bg-muted px-1.5 py-0.5 text-[11px] font-semibold text-foreground"
+                      className="inline-flex rounded-sm border border-border bg-muted px-1.5 py-0.5 text-xs font-semibold text-foreground"
                     >
                       {segment}
                     </span>

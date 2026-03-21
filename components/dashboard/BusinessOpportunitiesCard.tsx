@@ -361,7 +361,7 @@ export function BusinessOpportunitiesCard() {
 
   return (
     <section className="min-w-0 overflow-hidden min-h-[420px]">
-      <div className="p-5">
+      <div className="px-3 sm:px-5 py-4 sm:py-5">
         <h2 className="flex items-center gap-2 border-l-[3px] border-primary pl-3 text-lg font-semibold text-foreground tracking-tight">
           <Layers size={18} className="text-primary shrink-0" />
           Business Opportunities

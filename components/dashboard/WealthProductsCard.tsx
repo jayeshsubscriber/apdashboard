@@ -508,7 +508,7 @@ function ShareModal({
                 ))}
               </div>
               {activeSegment !== "all" && (
-                <p className="mt-2 text-[11px] text-muted-foreground">
+                <p className="mt-2 text-xs text-muted-foreground">
                   {
                     BUSINESS_SEGMENTS.find((s) => s.id === activeSegment)
                       ?.description
@@ -562,7 +562,7 @@ function ShareModal({
                       className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors"
                     >
                       {/* Avatar */}
-                      <div className="h-8 w-8 shrink-0 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-[11px] font-semibold text-primary">
+                      <div className="h-8 w-8 shrink-0 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-xs font-semibold text-primary">
                         {customer.name
                           .split(" ")
                           .slice(0, 2)
@@ -573,10 +573,10 @@ function ShareModal({
 
                       {/* Name + UCC */}
                       <div className="flex-1 min-w-0">
-                        <div className="text-[13px] font-medium text-foreground truncate">
+                        <div className="text-sm font-medium text-foreground truncate">
                           {customer.name}
                         </div>
-                        <div className="text-[11px] text-muted-foreground">
+                        <div className="text-xs text-muted-foreground">
                           {customer.ucc}
                         </div>
                       </div>
@@ -709,7 +709,7 @@ function AdvisoryCard({
           {call.symbol}
         </div>
         <span
-          className={`shrink-0 rounded px-2 py-0.5 text-[11px] font-bold text-white ${
+          className={`shrink-0 rounded px-2 py-0.5 text-xs font-bold text-white ${
             isBuy ? "bg-emerald-600" : "bg-rose-600"
           }`}
         >
@@ -723,7 +723,7 @@ function AdvisoryCard({
           ₹{call.currentPrice}
         </div>
         <div
-          className={`text-[11px] font-medium ${
+          className={`text-xs font-medium ${
             isPositive ? "text-emerald-600" : "text-rose-600"
           }`}
         >
@@ -735,19 +735,19 @@ function AdvisoryCard({
       <div className="grid grid-cols-3 px-3 py-2.5 gap-1 border-b border-border/60">
         <div>
           <div className="text-[10px] text-muted-foreground">Stop-loss</div>
-          <div className="text-[12px] font-semibold text-foreground mt-0.5">
+          <div className="text-xs font-semibold text-foreground mt-0.5">
             {call.stopLoss}
           </div>
         </div>
         <div>
           <div className="text-[10px] text-muted-foreground">Entry</div>
-          <div className="text-[12px] font-semibold text-foreground mt-0.5">
+          <div className="text-xs font-semibold text-foreground mt-0.5">
             {call.entry}
           </div>
         </div>
         <div>
           <div className="text-[10px] text-muted-foreground">Target</div>
-          <div className="text-[12px] font-semibold text-foreground mt-0.5">
+          <div className="text-xs font-semibold text-foreground mt-0.5">
             {call.target}
           </div>
         </div>
@@ -756,7 +756,7 @@ function AdvisoryCard({
       {/* Footer */}
       <div className="flex items-center justify-between px-3 py-2.5 gap-2">
         <div>
-          <span className="text-[13px] font-bold text-emerald-700">
+          <span className="text-sm font-bold text-emerald-700">
             {call.potentialLeft}
           </span>
           <span className="ml-1 text-[10px] text-muted-foreground">
@@ -766,9 +766,9 @@ function AdvisoryCard({
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); onShareSingle(); }}
-          className="h-7 rounded-md border border-primary/30 bg-primary/10 px-2 text-[11px] font-medium text-primary inline-flex items-center gap-1 hover:bg-primary/20 transition-colors"
+          className="h-7 rounded-md border border-primary/30 bg-primary/10 px-2 text-xs font-medium text-primary inline-flex items-center gap-1 hover:bg-primary/20 transition-colors"
         >
-          <Share2 size={11} />
+          <Share2 size={12} />
           Share
         </button>
       </div>
@@ -818,7 +818,7 @@ export function WealthProductsCard() {
 
   return (
     <section className="min-w-0 overflow-hidden">
-      <div className="p-5">
+      <div className="px-3 sm:px-5 py-4 sm:py-5">
         <h2 className="flex items-center gap-2 border-l-[3px] border-primary pl-3 text-lg font-semibold text-foreground tracking-tight">
           <Landmark size={18} className="text-primary shrink-0" />
           Wealth Products
@@ -836,14 +836,14 @@ export function WealthProductsCard() {
                   <button
                     type="button"
                     onClick={clearAll}
-                    className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
                     Clear
                   </button>
                   <button
                     type="button"
                     onClick={() => setShareModalCalls(selectedCalls)}
-                    className="h-7 rounded-md bg-primary px-3 text-[11px] font-semibold text-white inline-flex items-center gap-1.5 hover:bg-primary/90 transition-colors"
+                    className="h-7 rounded-md bg-primary px-3 text-xs font-semibold text-white inline-flex items-center gap-1.5 hover:bg-primary/90 transition-colors"
                   >
                     <Share2 size={12} />
                     Share {selectedCalls.length} selected
@@ -853,7 +853,7 @@ export function WealthProductsCard() {
                 <button
                   type="button"
                   onClick={selectAll}
-                  className="text-[11px] text-muted-foreground hover:text-primary transition-colors shrink-0"
+                  className="text-xs text-muted-foreground hover:text-primary transition-colors shrink-0"
                 >
                   Select all
                 </button>
@@ -962,23 +962,23 @@ export function WealthProductsCard() {
                         className="grid grid-cols-[minmax(180px,0.9fr)_180px_145px_145px_110px_200px] gap-x-2 px-3 py-2 border-b border-border last:border-b-0"
                       >
                         <div className="pr-2">
-                          <div className="text-[13px] text-foreground truncate">
+                          <div className="text-sm text-foreground truncate">
                             {row.name}
                           </div>
-                          <div className="text-[11px] text-muted-foreground truncate">
+                          <div className="text-xs text-muted-foreground truncate">
                             {row.marketType}
                           </div>
                         </div>
-                        <div className="text-[13px] text-foreground text-right whitespace-nowrap">
+                        <div className="text-sm text-foreground text-right whitespace-nowrap">
                           {row.openClose}
                         </div>
-                        <div className="text-[13px] text-foreground text-right whitespace-nowrap">
+                        <div className="text-sm text-foreground text-right whitespace-nowrap">
                           {row.issueSize}
                         </div>
-                        <div className="text-[13px] text-foreground text-right whitespace-nowrap">
+                        <div className="text-sm text-foreground text-right whitespace-nowrap">
                           {row.priceRange}
                         </div>
-                        <div className="text-[13px] text-foreground text-right whitespace-nowrap">
+                        <div className="text-sm text-foreground text-right whitespace-nowrap">
                           {row.subscription}
                         </div>
                         <div className="flex items-center justify-end gap-2">
@@ -986,7 +986,7 @@ export function WealthProductsCard() {
                             href={UPSTOX_IPO_URL}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex h-7 items-center justify-center rounded-md border border-primary px-2.5 text-[11px] font-semibold text-primary transition-colors hover:bg-primary/5 whitespace-nowrap"
+                            className="inline-flex h-7 items-center justify-center rounded-md border border-primary px-2.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/5 whitespace-nowrap"
                           >
                             View Details
                           </a>
@@ -1058,44 +1058,44 @@ export function WealthProductsCard() {
                           />
                         </div>
                         <div className="min-w-0">
-                          <div className="text-[13px] text-foreground truncate">
+                          <div className="text-sm text-foreground truncate">
                             {row.name}
                           </div>
-                          <div className="text-[11px] text-muted-foreground truncate">
+                          <div className="text-xs text-muted-foreground truncate">
                             {row.amc} • {row.category}
                           </div>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[11px] text-muted-foreground">
+                        <div className="text-xs text-muted-foreground">
                           1Y Return
                         </div>
-                        <div className="text-[13px] text-foreground">
+                        <div className="text-sm text-foreground">
                           {row.return1Y}
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[11px] text-muted-foreground">
+                        <div className="text-xs text-muted-foreground">
                           3Y CAGR
                         </div>
-                        <div className="text-[13px] text-foreground">
+                        <div className="text-sm text-foreground">
                           {row.return3Y}
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[11px] text-muted-foreground">
+                        <div className="text-xs text-muted-foreground">
                           TER
                         </div>
-                        <div className="text-[13px] text-foreground">
+                        <div className="text-sm text-foreground">
                           {row.expenseRatio}
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[11px] text-muted-foreground">
+                        <div className="text-xs text-muted-foreground">
                           Risk
                         </div>
                         <span
-                          className={`inline-flex h-6 items-center rounded-full border px-2 text-[11px] ${riskPillClass(
+                          className={`inline-flex h-6 items-center rounded-full border px-2 text-xs ${riskPillClass(
                             row.risk
                           )}`}
                         >
@@ -1103,10 +1103,10 @@ export function WealthProductsCard() {
                         </span>
                       </div>
                       <div className="text-right">
-                        <div className="text-[11px] text-muted-foreground">
+                        <div className="text-xs text-muted-foreground">
                           AUM
                         </div>
-                        <div className="text-[13px] text-foreground">
+                        <div className="text-sm text-foreground">
                           {row.aum}
                         </div>
                       </div>

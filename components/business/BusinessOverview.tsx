@@ -4,8 +4,8 @@ import { BusinessOverviewSections } from "./BusinessOverviewSections";
 
 export function BusinessOverview() {
   return (
-    <main className="flex-1 p-4">
-      <section className="p-1">
+    <main className="flex-1 px-3 sm:px-4 py-3">
+      <section>
         <BusinessOverviewSections />
       </section>
     </main>

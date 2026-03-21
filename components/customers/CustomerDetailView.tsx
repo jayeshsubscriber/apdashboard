@@ -41,7 +41,7 @@ export function CustomerDetailView({ ucc, onBack }: Props) {
   }
 
   return (
-    <main className="flex-1 px-6 py-4">
+    <main className="flex-1 px-3 sm:px-6 py-4">
       {/* Header Area */}
       <div className="flex items-center gap-3">
         <button
@@ -60,11 +60,11 @@ export function CustomerDetailView({ ucc, onBack }: Props) {
         </span>
       </div>
 
-      <div className="mt-1 flex items-end justify-between">
-        <h1 className="text-2xl font-semibold text-foreground">
+      <div className="mt-1 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+        <h1 className="text-xl sm:text-2xl font-semibold text-foreground">
           {detail.profile.name}
         </h1>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {REPORTS.map((report) => (
             <button
               key={report}
@@ -81,7 +81,7 @@ export function CustomerDetailView({ ucc, onBack }: Props) {
       {/* Content Grid */}
       <div className="mt-4 grid grid-cols-12 gap-4 items-start">
         {/* Left Column */}
-        <div className="col-span-8 flex flex-col gap-4">
+        <div className="col-span-12 md:col-span-8 flex flex-col gap-4">
           <ClientProfileCard profile={detail.profile} />
           <FinancialOverviewCard financial={detail.financial} />
           <EquityHoldingsCard holdings={detail.equityHoldings} />
@@ -90,7 +90,7 @@ export function CustomerDetailView({ ucc, onBack }: Props) {
         </div>
 
         {/* Right Column */}
-        <aside className="col-span-4 sticky top-20 flex flex-col gap-4">
+        <aside className="col-span-12 md:col-span-4 md:sticky md:top-20 flex flex-col gap-4">
           <AumBreakdownChart breakdown={detail.aumBreakdown} />
           <PnlSummaryCard pnl={detail.pnlSummary} />
           <ActivityTimeline activities={detail.activities} />

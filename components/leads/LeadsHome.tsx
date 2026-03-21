@@ -5,7 +5,7 @@ import { ClientOnboardingLeadsPanel } from "@/components/customers/panels/Client
 
 export function LeadsHome() {
   return (
-    <main className="flex-1 p-4">
+    <main className="flex-1">
       <div className="flex flex-col gap-4 w-full">
         <NewClientOnboardingCard />
         <ClientOnboardingLeadsPanel />

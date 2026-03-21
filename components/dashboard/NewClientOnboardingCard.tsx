@@ -87,7 +87,7 @@ export function NewClientOnboardingCard() {
 
   return (
     <section className="min-w-0 overflow-visible">
-      <div className="p-5">
+      <div className="px-3 sm:px-5 py-4 sm:py-5">
         {/* Master header */}
         <div className="flex items-start justify-between gap-4">
           <div>

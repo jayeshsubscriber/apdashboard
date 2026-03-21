@@ -170,7 +170,7 @@ export function BusinessOpportunitiesPanel() {
                         type="button"
                         onClick={() => setActiveCardId(c.id)}
                         className={`w-full text-left rounded-md px-3 py-2 transition-colors ${
-                          isActive ? "bg-primary/5" : "bg-background hover:bg-muted/30"
+                          isActive ? "bg-primary/10" : "bg-background hover:bg-muted/30"
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2">
@@ -213,32 +213,36 @@ export function BusinessOpportunitiesPanel() {
               <div className="mt-0.5 text-xs text-muted-foreground">{activeCard.subtitle}</div>
             </div>
 
-            <div
-              className="grid border-b border-border px-3 py-2 gap-2"
-              style={{ gridTemplateColumns }}
-            >
-              {activeCard.columns.map((column) => (
+            <div className="overflow-x-auto">
+              <div style={{ minWidth: "640px" }}>
                 <div
-                  key={column.key}
-                  className={`text-xs font-semibold text-muted-foreground ${cellTextClass(column)}`}
-                >
-                  {column.label}
-                </div>
-              ))}
-            </div>
-
-            <div className="min-h-0 flex-1 overflow-auto">
-              {activeCard.rows.map((row) => (
-                <div
-                  key={row.id}
-                  className="grid px-3 py-2 border-b border-border last:border-b-0 gap-2"
+                  className="grid border-b border-border px-3 py-2 gap-2"
                   style={{ gridTemplateColumns }}
                 >
                   {activeCard.columns.map((column) => (
-                    <div key={column.key}>{renderCell(row, column)}</div>
+                    <div
+                      key={column.key}
+                      className={`text-xs font-semibold text-muted-foreground ${cellTextClass(column)}`}
+                    >
+                      {column.label}
+                    </div>
                   ))}
                 </div>
-              ))}
+
+                <div className="min-h-0 flex-1">
+                  {activeCard.rows.map((row) => (
+                    <div
+                      key={row.id}
+                      className="grid px-3 py-2 border-b border-border last:border-b-0 gap-2"
+                      style={{ gridTemplateColumns }}
+                    >
+                      {activeCard.columns.map((column) => (
+                        <div key={column.key}>{renderCell(row, column)}</div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="px-3 py-2 border-t border-border flex justify-end">

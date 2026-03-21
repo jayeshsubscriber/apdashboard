@@ -68,7 +68,10 @@ export function CustomersPanel({ onSelectCustomer }: Props) {
   return (
     <section className="p-3">
       <div className="flex items-start justify-between gap-3">
-        <h3 className="text-base font-semibold tracking-tight text-foreground">Customers</h3>
+        <h3 className="flex items-center gap-2 border-l-[3px] border-primary pl-3 text-lg font-semibold text-foreground tracking-tight">
+          <Users size={18} className="text-primary shrink-0" />
+          Customers
+        </h3>
         {customerRows.length > pageSize && !viewAll && (
           <button
             type="button"
