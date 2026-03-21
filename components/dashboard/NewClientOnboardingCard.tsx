@@ -87,7 +87,7 @@ export function NewClientOnboardingCard() {
   const maxAppValue = Math.max(...appStatusData.map((d) => d.value), 1);
 
   return (
-    <section className="rounded-md border border-border bg-card overflow-visible min-h-[460px]">
+    <section className="rounded-md border border-border bg-card overflow-visible">
       <div className="p-5">
         {/* Master header */}
         <div className="flex items-start justify-between gap-4">
@@ -117,7 +117,7 @@ export function NewClientOnboardingCard() {
         </div>
 
         {/* Two inner sections */}
-        <div className="mt-4 grid grid-cols-2 gap-5">
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* Left: Account status summary */}
           <div className="rounded-md border border-border bg-card p-4">
             <h3 className="text-base font-semibold text-foreground tracking-tight">
@@ -151,7 +151,7 @@ export function NewClientOnboardingCard() {
                   </div>
                 </div>
 
-                <div className="mt-5 flex items-center gap-6">
+                <div className="mt-5 flex flex-wrap items-center gap-4">
                   {donutData.map((d) => (
                     <div key={d.name} className="flex items-center gap-2">
                       <span

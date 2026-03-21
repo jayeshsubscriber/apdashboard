@@ -204,12 +204,12 @@ export function BusinessOverview() {
         </h2>
 
         <div className="mt-4">
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
           <article className="min-w-0 rounded-md border border-border bg-card p-3">
             <h3 className="text-base font-semibold tracking-tight text-foreground">
               Active Clients (Traded)
             </h3>
-            <div className="mt-2 h-[300px]">
+            <div className="mt-2 h-[220px] sm:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={EQUITY_STATS} margin={{ top: 8, right: 8, left: 0, bottom: 12 }}>
                   <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" />
@@ -253,7 +253,7 @@ export function BusinessOverview() {
 
           <article className="min-w-0 rounded-md border border-border bg-card p-3">
             <h3 className="text-base font-semibold tracking-tight text-foreground">Total Orders</h3>
-            <div className="mt-2 h-[300px]">
+            <div className="mt-2 h-[220px] sm:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={EQUITY_STATS} margin={{ top: 8, right: 8, left: 0, bottom: 12 }}>
                   <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" />
@@ -299,7 +299,7 @@ export function BusinessOverview() {
             <h3 className="text-base font-semibold tracking-tight text-foreground">
               App Download Statistics
             </h3>
-            <div className="mt-2 h-[300px]">
+            <div className="mt-2 h-[220px] sm:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={APP_DOWNLOAD_STATS}
@@ -349,7 +349,7 @@ export function BusinessOverview() {
             <h3 className="text-base font-semibold tracking-tight text-foreground">
               Closed/Inactive Client Accounts
             </h3>
-            <div className="mt-2 h-[300px]">
+            <div className="mt-2 h-[220px] sm:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={INACTIVE_CLIENT_STATS}
@@ -428,8 +428,8 @@ export function BusinessOverview() {
             </div>
           </div>
 
-          <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-7 rounded-md border border-border bg-card px-2.5 pb-2 pt-2">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <div className="lg:col-span-7 rounded-md border border-border bg-card px-2.5 pb-2 pt-2">
               <div className="mb-1 text-base font-semibold tracking-tight text-foreground">
                 AUM Overview
               </div>
@@ -473,7 +473,7 @@ export function BusinessOverview() {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-1 flex items-center justify-center gap-5 text-xs text-muted-foreground">
+              <div className="mt-1 flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
                 {activeAumConfig.segments.map((segment) => (
                   <div key={segment.name} className="inline-flex items-center gap-1.5 whitespace-nowrap">
                     <span
@@ -486,11 +486,11 @@ export function BusinessOverview() {
               </div>
             </div>
 
-            <div className="col-span-5">
+            <div className="lg:col-span-5">
               <div
                 className={
                   activeAumTab === "mutualFunds"
-                    ? "grid grid-cols-[minmax(0,1fr)_260px] gap-3 items-start"
+                    ? "grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] gap-3 items-start"
                     : "block"
                 }
               >

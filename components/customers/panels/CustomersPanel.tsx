@@ -59,7 +59,7 @@ export function CustomersPanel() {
         )}
       </div>
 
-      <div className="mt-3 grid grid-cols-1 gap-3 xl:grid-cols-[300px_minmax(0,1fr)] items-start">
+      <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-[280px_minmax(0,1fr)] items-start">
         <aside className="sticky top-24 self-start rounded-md border border-border bg-card">
           <div className="grid grid-cols-2 divide-x divide-y border-b border-border h-fit">
             {customerInsights.map((insight) => (
@@ -104,8 +104,9 @@ export function CustomersPanel() {
 
         <div className="min-w-0">
           <div className="overflow-x-auto rounded-md border border-border">
+            <div className="min-w-[1200px]">
             <div className="grid grid-cols-[140px_1fr_150px_120px_170px_190px_220px_260px] border-b border-border bg-muted/20 px-3 py-2 text-xs font-semibold text-muted-foreground">
-              <div>UCC</div>
+              <div className="sticky left-0 bg-muted/20 z-10">UCC</div>
               <div>Client Name</div>
               <div>Equity AUM</div>
               <div>MF AUM</div>
@@ -127,7 +128,7 @@ export function CustomersPanel() {
                 key={r.ucc}
                 className="grid grid-cols-[140px_1fr_150px_120px_170px_190px_220px_260px] items-start border-b border-border px-3 py-2 text-[13px] last:border-b-0"
               >
-                <div className="truncate">{r.ucc}</div>
+                <div className="sticky left-0 bg-card z-10 truncate">{r.ucc}</div>
                 <div className="truncate">{r.name}</div>
                 <div className="text-muted-foreground">{r.equityAum}</div>
                 <div className="text-muted-foreground">{r.mfAum}</div>
@@ -155,6 +156,7 @@ export function CustomersPanel() {
                 </div>
               </div>
             ))}
+            </div>
           </div>
           {canPaginate && (
             <div className="flex items-center justify-end gap-3 px-1 pt-2">
@@ -162,7 +164,7 @@ export function CustomersPanel() {
                 type="button"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="h-8 rounded-md border border-border bg-background px-3 text-sm font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-10 rounded-md border border-border bg-background px-3 text-sm font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Prev
               </button>
@@ -173,7 +175,7 @@ export function CustomersPanel() {
                 type="button"
                 onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
                 disabled={page >= pageCount}
-                className="h-8 rounded-md border border-border bg-background px-3 text-sm font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-10 rounded-md border border-border bg-background px-3 text-sm font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Next
               </button>

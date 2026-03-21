@@ -69,13 +69,13 @@ export function CustomersHome() {
       </div>
 
       <section className="space-y-4">
-        <section id="client-onboarding-leads" className="scroll-mt-16">
+        <section id="client-onboarding-leads" className="scroll-mt-24 md:scroll-mt-16">
           <ClientOnboardingLeadsPanel />
         </section>
-        <section id="business-opportunities" className="scroll-mt-16">
+        <section id="business-opportunities" className="scroll-mt-24 md:scroll-mt-16">
           <BusinessOpportunitiesPanel />
         </section>
-        <section id="customers" className="scroll-mt-16">
+        <section id="customers" className="scroll-mt-24 md:scroll-mt-16">
           <CustomersPanel />
         </section>
       </section>
