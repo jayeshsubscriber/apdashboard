@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import {
   AlertTriangle,
   BarChart3,
@@ -53,7 +52,6 @@ type AumSegmentRow = {
   color: string;
 };
 
-type AumTabId = "equity" | "mutualFunds";
 type AumSummaryMetric = {
   label: string;
   value: string;
@@ -111,13 +109,7 @@ const INACTIVE_CLIENT_STATS: InactiveClientStatRow[] = [
   { month: "Jan 2026", inactiveClients: 43 },
 ];
 
-const AUM_TABS: Array<{ id: AumTabId; label: string }> = [
-  { id: "equity", label: "Equity" },
-  { id: "mutualFunds", label: "Mutual Funds" },
-];
-
-const AUM_CONFIG_BY_TAB: Record<AumTabId, AumConfig> = {
-  equity: {
+const EQUITY_AUM_CONFIG: AumConfig = {
     totalLabel: "Rs 4,21,674",
     segments: [
       {
@@ -151,8 +143,9 @@ const AUM_CONFIG_BY_TAB: Record<AumTabId, AumConfig> = {
       { label: "Never traded", value: "602" },
       { label: "Clients near churn", value: "29" },
     ],
-  },
-  mutualFunds: {
+};
+
+const MUTUAL_FUNDS_AUM_CONFIG: AumConfig = {
     totalLabel: "Rs 2,86,940",
     segments: [
       {
@@ -185,7 +178,6 @@ const AUM_CONFIG_BY_TAB: Record<AumTabId, AumConfig> = {
       { label: "SIP Input Value", value: "₹2,73,659" },
       { label: "Upcoming SIPs in next 7 days", value: "83" },
     ],
-  },
 };
 
 function formatNumber(value: number) {
@@ -238,13 +230,95 @@ function SummaryMetricIcon({ label }: { label: string }) {
   }
 }
 
-export function BusinessOverview() {
-  const [activeAumTab, setActiveAumTab] = useState<AumTabId>("equity");
-  const activeAumConfig = useMemo(
-    () => AUM_CONFIG_BY_TAB[activeAumTab],
-    [activeAumTab]
-  );
+function AumOverviewColumn({ title, config }: { title: string; config: AumConfig }) {
+  const { segments, summaryMonth, summaryMetrics } = config;
 
+  return (
+    <div className="min-w-0 rounded-md border border-border bg-card px-2.5 pb-2 pt-2">
+      <div className="mb-1 text-base font-semibold tracking-tight text-foreground">{title}</div>
+      <div className="h-[200px] min-h-[200px] sm:h-[248px] sm:min-h-[248px] overflow-visible">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart margin={{ top: 0, right: 4, left: 4, bottom: 0 }}>
+            <Pie
+              data={segments}
+              dataKey="value"
+              nameKey="name"
+              startAngle={180}
+              endAngle={0}
+              innerRadius="46%"
+              outerRadius="106%"
+              cx="50%"
+              cy="88%"
+              stroke="var(--color-card)"
+              strokeWidth={3}
+            >
+              {segments.map((segment) => (
+                <Cell key={segment.name} fill={segment.color} />
+              ))}
+            </Pie>
+            <Tooltip
+              formatter={(_, __, item) => {
+                const payload = item?.payload as AumSegmentRow | undefined;
+                const amount = payload?.amountLabel ?? "";
+                const percent =
+                  payload?.value !== undefined ? `${payload.value.toFixed(2)}%` : "";
+                return [`${amount} (${percent})`, "Amount"];
+              }}
+              labelFormatter={(_, payload) => payload?.[0]?.name ?? ""}
+              contentStyle={{
+                borderColor: "var(--color-border)",
+                backgroundColor: "var(--color-card)",
+                borderRadius: "0.5rem",
+              }}
+              itemStyle={{ color: "var(--color-foreground)" }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="mt-1 flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
+        {segments.map((segment) => (
+          <div key={segment.name} className="inline-flex items-center gap-1.5 whitespace-nowrap">
+            <span
+              className="h-2.5 w-2.5 shrink-0 rounded-full"
+              style={{ backgroundColor: segment.color }}
+            />
+            <span>{segment.name}</span>
+          </div>
+        ))}
+      </div>
+      <div className="mt-3">
+        <div className="mb-2 text-sm font-semibold text-foreground">Summary - {summaryMonth}</div>
+        <div className="grid grid-cols-1 min-[420px]:grid-cols-3 overflow-hidden rounded-md border border-border divide-x divide-y divide-border">
+          {summaryMetrics.map((metric) => (
+            <article
+              key={metric.label}
+              className="flex min-h-[74px] flex-col items-start gap-2.5 p-2.5"
+            >
+              <div className="flex items-center gap-1.5 text-xs font-medium leading-none text-muted-foreground">
+                <SummaryMetricIcon label={metric.label} />
+                <span>{metric.label}</span>
+              </div>
+              <div className="text-lg font-semibold leading-tight text-foreground min-[420px]:text-xl min-[420px]:leading-none">
+                {metric.value}
+              </div>
+            </article>
+          ))}
+          {summaryMetrics.length % 3 === 1 && (
+            <>
+              <div aria-hidden className="min-h-[74px] hidden min-[420px]:block" />
+              <div aria-hidden className="min-h-[74px] hidden min-[420px]:block" />
+            </>
+          )}
+          {summaryMetrics.length % 3 === 2 && (
+            <div aria-hidden className="min-h-[74px] hidden min-[420px]:block" />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function BusinessOverview() {
   return (
     <main className="flex-1 p-4">
       <section className="p-1">
@@ -455,119 +529,10 @@ export function BusinessOverview() {
             <h3 className="text-base font-semibold tracking-tight text-foreground">AUM Summary</h3>
           </div>
 
-          <div className="mb-3 border-b border-border">
-            <div className="flex items-center gap-5">
-              {AUM_TABS.map((tab) => {
-                const isActive = tab.id === activeAumTab;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveAumTab(tab.id)}
-                    className={`rounded-none border-b-2 pb-2 text-xs font-semibold uppercase tracking-wide transition-colors ${
-                      isActive
-                        ? "border-primary text-primary"
-                        : "border-transparent text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            <div className="lg:col-span-7 rounded-md border border-border bg-card px-2.5 pb-2 pt-2">
-              <div className="mb-1 text-base font-semibold tracking-tight text-foreground">
-                {activeAumTab === "equity" ? "Equity AUM Overview" : "Mutual Funds AUM Overview"}
-              </div>
-              {/* Keep legend inside card so labels remain fully visible */}
-              <div className="h-[248px] overflow-visible">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart margin={{ top: 0, right: 4, left: 4, bottom: 0 }}>
-                    <Pie
-                      data={activeAumConfig.segments}
-                      dataKey="value"
-                      nameKey="name"
-                      startAngle={180}
-                      endAngle={0}
-                      innerRadius="46%"
-                      outerRadius="106%"
-                      cx="50%"
-                      cy="88%"
-                      stroke="var(--color-card)"
-                      strokeWidth={3}
-                    >
-                      {activeAumConfig.segments.map((segment) => (
-                        <Cell key={segment.name} fill={segment.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(_, __, item) => {
-                        const payload = item?.payload as AumSegmentRow | undefined;
-                        const amount = payload?.amountLabel ?? "";
-                        const percent =
-                          payload?.value !== undefined ? `${payload.value.toFixed(2)}%` : "";
-                        return [`${amount} (${percent})`, "Amount"];
-                      }}
-                      labelFormatter={(_, payload) => payload?.[0]?.name ?? ""}
-                      contentStyle={{
-                        borderColor: "var(--color-border)",
-                        backgroundColor: "var(--color-card)",
-                        borderRadius: "0.5rem",
-                      }}
-                      itemStyle={{ color: "var(--color-foreground)" }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-1 flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
-                {activeAumConfig.segments.map((segment) => (
-                  <div key={segment.name} className="inline-flex items-center gap-1.5 whitespace-nowrap">
-                    <span
-                      className="h-2.5 w-2.5 shrink-0 rounded-full"
-                      style={{ backgroundColor: segment.color }}
-                    />
-                    <span>{segment.name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="lg:col-span-5">
-              <div className="rounded-md border border-border bg-card p-3">
-                <div className="mb-2 text-sm font-semibold text-foreground">
-                  Summary - {activeAumConfig.summaryMonth}
-                </div>
-
-                <div className="grid grid-cols-1 min-[420px]:grid-cols-3 overflow-hidden rounded-md border border-border divide-x divide-y divide-border">
-                  {activeAumConfig.summaryMetrics.map((metric) => (
-                    <article
-                      key={metric.label}
-                      className="flex min-h-[74px] flex-col items-start gap-2.5 p-2.5"
-                    >
-                      <div className="flex items-center gap-1.5 text-xs font-medium leading-none text-muted-foreground">
-                        <SummaryMetricIcon label={metric.label} />
-                        <span>{metric.label}</span>
-                      </div>
-                      <div className="text-lg font-semibold leading-tight text-foreground min-[420px]:text-xl min-[420px]:leading-none">
-                        {metric.value}
-                      </div>
-                    </article>
-                  ))}
-                  {activeAumConfig.summaryMetrics.length % 3 === 1 && (
-                    <>
-                      <div aria-hidden className="min-h-[74px] hidden min-[420px]:block" />
-                      <div aria-hidden className="min-h-[74px] hidden min-[420px]:block" />
-                    </>
-                  )}
-                  {activeAumConfig.summaryMetrics.length % 3 === 2 && (
-                    <div aria-hidden className="min-h-[74px] hidden min-[420px]:block" />
-                  )}
-                </div>
-              </div>
-            </div>
+          {/* Equity + MF charts side by side on large screens; stack on mobile (responsive-only). */}
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <AumOverviewColumn title="Equity AUM Overview" config={EQUITY_AUM_CONFIG} />
+            <AumOverviewColumn title="Mutual Funds AUM Overview" config={MUTUAL_FUNDS_AUM_CONFIG} />
           </div>
         </section>
       </section>
