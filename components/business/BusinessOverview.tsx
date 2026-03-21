@@ -209,7 +209,7 @@ export function BusinessOverview() {
             <h3 className="text-base font-semibold tracking-tight text-foreground">
               Active Clients (Traded)
             </h3>
-            <div className="mt-2 h-[300px]">
+            <div className="mt-2 h-[220px] sm:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={EQUITY_STATS} margin={{ top: 8, right: 8, left: 0, bottom: 12 }}>
                   <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" />
@@ -253,7 +253,7 @@ export function BusinessOverview() {
 
           <article className="min-w-0 rounded-md border border-border bg-card p-3">
             <h3 className="text-base font-semibold tracking-tight text-foreground">Total Orders</h3>
-            <div className="mt-2 h-[300px]">
+            <div className="mt-2 h-[220px] sm:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={EQUITY_STATS} margin={{ top: 8, right: 8, left: 0, bottom: 12 }}>
                   <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" />
@@ -299,7 +299,7 @@ export function BusinessOverview() {
             <h3 className="text-base font-semibold tracking-tight text-foreground">
               App Download Statistics
             </h3>
-            <div className="mt-2 h-[300px]">
+            <div className="mt-2 h-[220px] sm:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={APP_DOWNLOAD_STATS}
@@ -349,7 +349,7 @@ export function BusinessOverview() {
             <h3 className="text-base font-semibold tracking-tight text-foreground">
               Closed/Inactive Client Accounts
             </h3>
-            <div className="mt-2 h-[300px]">
+            <div className="mt-2 h-[220px] sm:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={INACTIVE_CLIENT_STATS}

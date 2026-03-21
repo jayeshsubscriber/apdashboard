@@ -129,12 +129,12 @@ export function BusinessOpportunitiesPanel() {
       <h3 className="text-base font-semibold tracking-tight text-foreground">Business Opportunities</h3>
 
       <div className="mt-3">
-        <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[300px_minmax(0,1fr)] items-stretch">
-          <aside className="h-full rounded-md border border-border bg-card overflow-hidden min-w-0">
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[260px_minmax(0,1fr)] items-stretch">
+          <aside className="rounded-md border border-border bg-card overflow-hidden min-w-0">
             <div className="p-3 border-b border-border bg-muted/20">
               <div className="text-xs font-semibold text-muted-foreground">Categories</div>
             </div>
-            <div className="p-3 space-y-5">
+            <div className="p-3 space-y-5 max-h-[240px] overflow-y-auto md:max-h-none">
               {BUSINESS_SECTIONS.map((group) => {
                 const groupCards = cardsBySection[group.id];
                 return (

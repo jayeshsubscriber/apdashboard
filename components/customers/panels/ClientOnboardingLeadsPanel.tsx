@@ -84,8 +84,45 @@ export function ClientOnboardingLeadsPanel() {
         <h3 className="text-base font-semibold tracking-tight text-foreground">Client Onboarding Leads</h3>
         <div className="mt-1 text-xs text-muted-foreground">The report contains lead data for 30 days and refreshes every 15 minutes.</div>
       </div>
+      {/* Mobile: horizontal scrollable step pills (hidden on xl+) */}
+      <div className="mt-3 xl:hidden overflow-x-auto pb-1">
+        <div className="flex gap-2 min-w-max">
+          <button
+            type="button"
+            onClick={() => setActiveStep(null)}
+            className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-medium transition-colors shrink-0 ${
+              activeStep === null
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+            }`}
+          >
+            All Steps
+          </button>
+          {onboardingSteps.map((step) => {
+            const isSelected = activeStep === step.id;
+            return (
+              <button
+                key={step.id}
+                type="button"
+                onClick={() => handleStepClick(step.id)}
+                className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-medium transition-colors shrink-0 ${
+                  isSelected
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                <span className="whitespace-nowrap">{step.id}. {step.title}</span>
+                <span className="inline-flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                  {stepCounts.get(step.id) ?? 0}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="mt-3 grid grid-cols-1 gap-3 xl:grid-cols-[300px_minmax(0,1fr)]">
-        <aside className="rounded-md border border-border bg-card p-2.5">
+        <aside className="hidden xl:block rounded-md border border-border bg-card p-2.5">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-xs font-semibold text-muted-foreground">Steps</span>
           </div>

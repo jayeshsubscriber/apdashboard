@@ -322,13 +322,13 @@ export function WealthProductsCard() {
         <div className="mt-4 space-y-6">
           <div>
             <div className="mb-3 text-[18px] font-semibold text-foreground tracking-tight">Advisory</div>
-              <div className="mb-3 flex items-center gap-2">
+              <div className="mb-3 flex items-center gap-2 overflow-x-auto pb-1">
                 {ADVISORY_TABS.map((tab) => (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveAdvisoryTab(tab.id)}
-                    className={`h-7 rounded-full border px-3 text-xs font-medium transition-colors ${
+                    className={`h-7 rounded-full border px-3 text-xs font-medium transition-colors shrink-0 whitespace-nowrap ${
                       activeAdvisoryTab === tab.id
                         ? "border-primary bg-primary text-primary-foreground"
                         : "border-border text-muted-foreground hover:text-foreground"
@@ -429,8 +429,8 @@ export function WealthProductsCard() {
           <div>
             <div className="mb-3 text-[18px] font-semibold text-foreground tracking-tight">IPO Overview</div>
             <div className="rounded-md border border-border bg-card overflow-hidden">
-              <div className="border-b border-border px-3 py-2 bg-muted/20 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
+              <div className="border-b border-border px-3 py-2 bg-muted/20 flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2 overflow-x-auto">
                   {IPO_TABS.map((tab) => (
                     <button
                       key={tab.id}
@@ -509,7 +509,7 @@ export function WealthProductsCard() {
               Mutual Funds
             </div>
             <div className="rounded-md border border-border bg-card overflow-hidden">
-              <div className="border-b border-border px-3 py-2 bg-muted/20 flex items-center justify-between gap-3">
+              <div className="border-b border-border px-3 py-2 bg-muted/20 flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   {MF_TABS.map((tab) => (
                     <button

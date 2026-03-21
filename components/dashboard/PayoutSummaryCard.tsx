@@ -107,7 +107,7 @@ export function PayoutSummaryCard() {
   const chartMax = Math.ceil(maxValue / 10000) * 10000;
 
   return (
-    <section className="rounded-md border border-border bg-card overflow-hidden min-h-[340px]">
+    <section className="rounded-md border border-border bg-card overflow-hidden">
       <div className="p-5">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
           <div>
@@ -142,7 +142,7 @@ export function PayoutSummaryCard() {
           </div>
         </div>
 
-        <div className="mt-3 h-[260px]">
+        <div className="mt-3 h-[200px] sm:h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data}

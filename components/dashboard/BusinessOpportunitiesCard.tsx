@@ -396,16 +396,15 @@ export function BusinessOpportunitiesCard() {
             <div className="mb-3 text-[18px] font-semibold text-foreground tracking-tight">
               At Risk Clients
             </div>
-            <div className="overflow-x-auto pb-1">
-              <div className="flex min-w-max gap-4">
-                <div className="w-[320px] rounded-md border border-border bg-card overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-4">
+                <div className="rounded-md border border-border bg-card overflow-hidden">
                   <div className="px-3 py-2 border-b border-border bg-muted/20">
                     <div className="text-base font-semibold text-foreground">
                       At Risk Client Summary
                     </div>
                   </div>
 
-                  <div className="p-3 space-y-2">
+                  <div className="p-3 space-y-2 max-h-[180px] overflow-y-auto md:max-h-none">
                     <button
                       type="button"
                       onClick={() => setAtRiskFilter("likelyToLapse")}
@@ -469,14 +468,15 @@ export function BusinessOpportunitiesCard() {
                   </div>
                 </div>
 
-                <div className="w-[900px] rounded-md border border-border bg-card overflow-hidden">
+                <div className="rounded-md border border-border bg-card overflow-hidden overflow-x-auto">
+                  <div className="min-w-[320px]">
                   <div className="px-3 py-2 border-b border-border bg-muted/20">
                     <div className="text-base font-semibold text-foreground">
                       {atRiskCardMap[atRiskFilter].title}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-[1fr_180px_130px] border-b border-border px-3 py-2">
+                  <div className="grid grid-cols-[1fr_160px_110px] border-b border-border px-3 py-2">
                     <div className="text-xs font-semibold text-muted-foreground">
                       Top 5 Clients
                     </div>
@@ -484,7 +484,7 @@ export function BusinessOpportunitiesCard() {
                       {atRiskCardMap[atRiskFilter].metricHeader}
                     </div>
                     <div className="text-xs font-semibold text-muted-foreground text-right">
-                      Suggested Action
+                      Action
                     </div>
                   </div>
 
@@ -492,7 +492,7 @@ export function BusinessOpportunitiesCard() {
                     {atRiskCardMap[atRiskFilter].clients.map((client) => (
                       <div
                         key={client.name}
-                        className="grid grid-cols-[1fr_180px_130px] px-3 py-2 border-b border-border last:border-b-0"
+                        className="grid grid-cols-[1fr_160px_110px] px-3 py-2 border-b border-border last:border-b-0"
                       >
                         <div className="text-[13px] text-foreground truncate pr-2">
                           {client.name}
@@ -530,8 +530,8 @@ export function BusinessOpportunitiesCard() {
                       VIEW ALL
                     </button>
                   </div>
+                  </div>
                 </div>
-              </div>
             </div>
             </div>
           )}
@@ -553,16 +553,15 @@ export function BusinessOpportunitiesCard() {
                 <option value="last90">Last 90 Days</option>
               </select>
             </div>
-            <div className="overflow-x-auto pb-1">
-              <div className="flex min-w-max gap-4">
-                <div className="w-[320px] rounded-md border border-border bg-card overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-4">
+                <div className="rounded-md border border-border bg-card overflow-hidden">
                   <div className="px-3 py-2 border-b border-border bg-muted/20">
                     <div className="text-base font-semibold text-foreground">
                       Activation Summary
                     </div>
                   </div>
 
-                  <div className="p-3 space-y-2">
+                  <div className="p-3 space-y-2 max-h-[180px] overflow-y-auto md:max-h-none">
                     <button
                       type="button"
                       onClick={() => setActivationTableFilter("leads")}
@@ -646,7 +645,8 @@ export function BusinessOpportunitiesCard() {
                   </div>
                 </div>
 
-                <div className="w-[900px] rounded-md border border-border bg-card overflow-hidden">
+                <div className="rounded-md border border-border bg-card overflow-hidden overflow-x-auto">
+                  <div className="min-w-[380px]">
                   <div className="px-3 py-2 border-b border-border bg-muted/20">
                     <div className="text-base font-semibold text-foreground">
                       {activationTableFilter === "onboarded"
@@ -661,7 +661,7 @@ export function BusinessOpportunitiesCard() {
 
                   {activationTableFilter === "notActivated" ? (
                     <>
-                      <div className="grid grid-cols-[1fr_140px_150px] border-b border-border px-3 py-2">
+                      <div className="grid grid-cols-[1fr_140px_110px] border-b border-border px-3 py-2">
                         <div className="text-xs font-semibold text-muted-foreground">Client</div>
                         <div className="text-xs font-semibold text-muted-foreground text-right">
                           Onboarded On
@@ -675,7 +675,7 @@ export function BusinessOpportunitiesCard() {
                         {ACTIVATION_RECENT_CLIENTS.map((client) => (
                           <div
                             key={client.name}
-                            className="grid grid-cols-[1fr_140px_150px] px-3 py-2 border-b border-border last:border-b-0"
+                            className="grid grid-cols-[1fr_140px_110px] px-3 py-2 border-b border-border last:border-b-0"
                           >
                             <div className="text-[13px] text-foreground truncate pr-2">
                               {client.name}
@@ -808,8 +808,8 @@ export function BusinessOpportunitiesCard() {
                       VIEW ALL
                     </button>
                   </div>
+                  </div>
                 </div>
-              </div>
             </div>
             </div>
           )}
@@ -819,16 +819,15 @@ export function BusinessOpportunitiesCard() {
             <div className="mb-3 text-[18px] font-semibold text-foreground tracking-tight">
               Cross Sell
             </div>
-            <div className="overflow-x-auto pb-1">
-              <div className="flex min-w-max gap-4">
-                <div className="w-[320px] rounded-md border border-border bg-card overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-4">
+                <div className="rounded-md border border-border bg-card overflow-hidden">
                   <div className="px-3 py-2 border-b border-border bg-muted/20">
                     <div className="text-base font-semibold text-foreground">
                       Cross Sell Summary
                     </div>
                   </div>
 
-                  <div className="p-3 space-y-2">
+                  <div className="p-3 space-y-2 max-h-[180px] overflow-y-auto md:max-h-none">
                     {CROSS_SELL_CARDS.map((card) => {
                       const isActive = crossSellFilter === card.id;
                       const Icon =
@@ -868,13 +867,14 @@ export function BusinessOpportunitiesCard() {
                   </div>
                 </div>
 
-                <div className="w-[900px] rounded-md border border-border bg-card overflow-hidden">
+                <div className="rounded-md border border-border bg-card overflow-hidden overflow-x-auto">
+                  <div className="min-w-[320px]">
                   <div className="px-3 py-2 border-b border-border bg-muted/20">
                     <div className="text-base font-semibold text-foreground">
                       {activeCrossSellCard.title}
                     </div>
                   </div>
-                  <div className="grid grid-cols-[1fr_220px_130px] border-b border-border px-3 py-2">
+                  <div className="grid grid-cols-[1fr_160px_110px] border-b border-border px-3 py-2">
                     <div className="text-xs font-semibold text-muted-foreground">
                       Client Name (UCC)
                     </div>
@@ -882,7 +882,7 @@ export function BusinessOpportunitiesCard() {
                       {activeCrossSellCard.metricHeader}
                     </div>
                     <div className="text-xs font-semibold text-muted-foreground text-right">
-                      Suggested Action
+                      Action
                     </div>
                   </div>
 
@@ -890,7 +890,7 @@ export function BusinessOpportunitiesCard() {
                     {activeCrossSellCard.clients.map((row) => (
                       <div
                         key={row.name}
-                        className="grid grid-cols-[1fr_220px_130px] px-3 py-2 border-b border-border last:border-b-0"
+                        className="grid grid-cols-[1fr_160px_110px] px-3 py-2 border-b border-border last:border-b-0"
                       >
                         <div className="text-[13px] text-foreground truncate pr-2">
                           {row.name}
@@ -928,8 +928,8 @@ export function BusinessOpportunitiesCard() {
                       VIEW ALL
                     </button>
                   </div>
+                  </div>
                 </div>
-              </div>
             </div>
             </div>
           )}

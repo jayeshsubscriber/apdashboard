@@ -36,7 +36,7 @@ export function Header({
         <div className="flex items-center gap-2 shrink-0">
           <UpstoxLogo />
           <span
-            className="hidden sm:inline text-xs font-medium px-2 py-0.5 rounded-full border border-white/30 text-white/80"
+            className="text-xs font-medium px-2 py-0.5 rounded-full border border-white/30 text-white/80"
             style={{ backgroundColor: "rgba(255,255,255,0.12)" }}
           >
             AP Partner
@@ -160,7 +160,7 @@ export function Header({
             <button
               key={tab.id}
               onClick={() => onTabChange?.(tab.id)}
-              className="relative flex-1 min-w-[80px] py-2 text-xs font-medium whitespace-nowrap text-center"
+              className="relative flex-1 min-w-[80px] py-3 text-[13px] font-medium whitespace-nowrap text-center"
               style={{
                 color: isActive ? "white" : "rgba(255,255,255,0.6)",
               }}
