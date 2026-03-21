@@ -17,7 +17,6 @@ import {
 
 type MainTab = "atRiskClients" | "activation" | "crossSell";
 type ActivationTableFilter = "onboarded" | "activated" | "notActivated" | "leads";
-type ActivationRangeId = "last7" | "last30" | "last90";
 type AtRiskFilter = "likelyToLapse" | "highFnOLosses" | "topFive";
 type CrossSellFilter = "equityPotential" | "mtf" | "fno" | "ipo" | "intraday" | "mf";
 
@@ -347,12 +346,10 @@ const CROSS_SELL_CARDS: CrossSellCard[] = [
 ];
 
 export function BusinessOpportunitiesCard() {
-  const [activeNavTab, setActiveNavTab] = useState<MainTab>("atRiskClients");
+  const [activeNavTab, setActiveNavTab] = useState<MainTab>("activation");
   const [atRiskFilter, setAtRiskFilter] = useState<AtRiskFilter>("likelyToLapse");
   const [activationTableFilter, setActivationTableFilter] =
     useState<ActivationTableFilter>("leads");
-  const [activationRangeId, setActivationRangeId] =
-    useState<ActivationRangeId>("last30");
   const [crossSellFilter, setCrossSellFilter] = useState<CrossSellFilter>("equityPotential");
 
   const atRiskCardMap: Record<AtRiskFilter, OpportunityCardData> = {
@@ -363,9 +360,10 @@ export function BusinessOpportunitiesCard() {
   const activeCrossSellCard = CROSS_SELL_CARDS.find((card) => card.id === crossSellFilter) ?? CROSS_SELL_CARDS[0];
 
   return (
-    <section className="rounded-md border border-border bg-card overflow-hidden min-h-[420px]">
+    <section className="min-w-0 overflow-hidden min-h-[420px]">
       <div className="p-5">
-        <h2 className="text-lg font-semibold text-foreground tracking-tight">
+        <h2 className="flex items-center gap-2 border-l-[3px] border-primary pl-3 text-lg font-semibold text-foreground tracking-tight">
+          <Layers size={18} className="text-primary shrink-0" />
           Business Opportunities
         </h2>
 
@@ -393,9 +391,6 @@ export function BusinessOpportunitiesCard() {
         <div className="mt-4">
           {activeNavTab === "atRiskClients" && (
             <div>
-            <div className="mb-3 text-[18px] font-semibold text-foreground tracking-tight">
-              At Risk Clients
-            </div>
             <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-4">
                 <div className="rounded-md border border-border bg-card overflow-hidden">
                   <div className="px-3 py-2 border-b border-border bg-muted/20">
@@ -538,21 +533,6 @@ export function BusinessOpportunitiesCard() {
 
           {activeNavTab === "activation" && (
             <div>
-            <div className="mb-2 flex items-center justify-between gap-3">
-              <div className="text-[18px] font-semibold text-foreground tracking-tight">
-                Onboarding and Activation
-              </div>
-              <select
-                aria-label="Activation time interval"
-                value={activationRangeId}
-                onChange={(e) => setActivationRangeId(e.target.value as ActivationRangeId)}
-                className="h-8 rounded-md border border-border bg-card px-3 text-xs text-muted-foreground outline-none focus-visible:ring-1 focus-visible:ring-primary"
-              >
-                <option value="last7">Last 7 Days</option>
-                <option value="last30">Last 30 Days</option>
-                <option value="last90">Last 90 Days</option>
-              </select>
-            </div>
             <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-4">
                 <div className="rounded-md border border-border bg-card overflow-hidden">
                   <div className="px-3 py-2 border-b border-border bg-muted/20">
@@ -816,9 +796,6 @@ export function BusinessOpportunitiesCard() {
 
           {activeNavTab === "crossSell" && (
             <div>
-            <div className="mb-3 text-[18px] font-semibold text-foreground tracking-tight">
-              Cross Sell
-            </div>
             <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-4">
                 <div className="rounded-md border border-border bg-card overflow-hidden">
                   <div className="px-3 py-2 border-b border-border bg-muted/20">

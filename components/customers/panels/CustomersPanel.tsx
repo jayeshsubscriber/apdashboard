@@ -3,6 +3,7 @@
 import {
   AlertTriangle,
   Ban,
+  ChevronRight,
   Eye,
   TrendingUp,
   UserCheck,
@@ -13,23 +14,56 @@ import { customerInsights, customerRows } from "../data";
 import { useMemo, useState } from "react";
 
 type Props = { onSelectCustomer: (ucc: string) => void };
+type CustomerInsightId = (typeof customerInsights)[number]["id"];
 
 export function CustomersPanel({ onSelectCustomer }: Props) {
   const pageSize = 20;
   const [page, setPage] = useState(1);
   const [viewAll, setViewAll] = useState(false);
+  const [activeInsightId, setActiveInsightId] = useState<CustomerInsightId>(
+    customerInsights[0]?.id ?? "totalClients"
+  );
+
+  const filteredCustomers = useMemo(() => {
+    const bucketFromUcc = (ucc: string) => {
+      const digits = ucc.replace(/\D/g, "");
+      return Number(digits.slice(-2) || "0") % 100;
+    };
+
+    switch (activeInsightId) {
+      case "active":
+        return customerRows.filter((row) => bucketFromUcc(row.ucc) < 75);
+      case "inactive":
+        return customerRows.filter((row) => bucketFromUcc(row.ucc) >= 75);
+      case "traded":
+        return customerRows.filter((row) => bucketFromUcc(row.ucc) < 68);
+      case "neverTraded":
+        return customerRows.filter((row) => {
+          const b = bucketFromUcc(row.ucc);
+          return b >= 68 && b < 83;
+        });
+      case "nearChurn":
+        return customerRows.filter(
+          (row) =>
+            row.suggestedActions.includes("Likely to lapse") || bucketFromUcc(row.ucc) >= 90
+        );
+      case "totalClients":
+      default:
+        return customerRows;
+    }
+  }, [activeInsightId]);
 
   const pageCount = useMemo(() => {
-    return Math.max(1, Math.ceil(customerRows.length / pageSize));
-  }, []);
+    return Math.max(1, Math.ceil(filteredCustomers.length / pageSize));
+  }, [filteredCustomers]);
 
   const visibleCustomers = useMemo(() => {
-    if (viewAll) return customerRows;
+    if (viewAll) return filteredCustomers;
     const start = (page - 1) * pageSize;
-    return customerRows.slice(start, start + pageSize);
-  }, [page, viewAll]);
+    return filteredCustomers.slice(start, start + pageSize);
+  }, [filteredCustomers, page, viewAll]);
 
-  const canPaginate = customerRows.length > pageSize && !viewAll;
+  const canPaginate = filteredCustomers.length > pageSize && !viewAll;
 
   return (
     <section className="p-3">
@@ -63,43 +97,61 @@ export function CustomersPanel({ onSelectCustomer }: Props) {
 
       <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-[280px_minmax(0,1fr)] items-start">
         <aside className="sticky top-24 self-start rounded-md border border-border bg-card">
-          <div className="grid grid-cols-2 divide-x divide-y border-b border-border h-fit">
+          <div className="p-3 border-b border-border bg-muted/20">
+            <div className="text-xs font-semibold text-muted-foreground">Overview</div>
+          </div>
+          <div className="p-3 space-y-2">
             {customerInsights.map((insight) => (
-              <article
+              <button
                 key={insight.id}
-                className="flex flex-col items-start gap-1.5 p-2.5 min-h-[74px]"
+                type="button"
+                onClick={() => {
+                  setActiveInsightId(insight.id);
+                  setPage(1);
+                  setViewAll(false);
+                }}
+                className={`w-full text-left rounded-md px-3 py-2 transition-colors ${
+                  activeInsightId === insight.id
+                    ? "bg-primary/5"
+                    : "bg-background hover:bg-muted/30"
+                }`}
               >
-                <div className="flex items-center gap-2">
-                  {insight.id === "totalClients" && (
-                    <Users size={18} className="text-primary" aria-hidden />
-                  )}
-                  {insight.id === "active" && (
-                    <UserCheck size={18} className="text-primary" aria-hidden />
-                  )}
-                  {insight.id === "inactive" && (
-                    <UserX size={18} className="text-primary" aria-hidden />
-                  )}
-                  {insight.id === "traded" && (
-                    <TrendingUp size={18} className="text-primary" aria-hidden />
-                  )}
-                  {insight.id === "neverTraded" && (
-                    <Ban size={18} className="text-primary" aria-hidden />
-                  )}
-                  {insight.id === "nearChurn" && (
-                    <AlertTriangle
-                      size={18}
-                      className="text-primary"
-                      aria-hidden
-                    />
-                  )}
-                  <div className="text-xs font-medium leading-none text-muted-foreground">
-                    {insight.label}
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-2">
+                    {insight.id === "totalClients" && (
+                      <Users size={16} className={activeInsightId === insight.id ? "text-primary" : "text-muted-foreground"} aria-hidden />
+                    )}
+                    {insight.id === "active" && (
+                      <UserCheck size={16} className={activeInsightId === insight.id ? "text-primary" : "text-muted-foreground"} aria-hidden />
+                    )}
+                    {insight.id === "inactive" && (
+                      <UserX size={16} className={activeInsightId === insight.id ? "text-primary" : "text-muted-foreground"} aria-hidden />
+                    )}
+                    {insight.id === "traded" && (
+                      <TrendingUp size={16} className={activeInsightId === insight.id ? "text-primary" : "text-muted-foreground"} aria-hidden />
+                    )}
+                    {insight.id === "neverTraded" && (
+                      <Ban size={16} className={activeInsightId === insight.id ? "text-primary" : "text-muted-foreground"} aria-hidden />
+                    )}
+                    {insight.id === "nearChurn" && (
+                      <AlertTriangle
+                        size={16}
+                        className={activeInsightId === insight.id ? "text-primary" : "text-muted-foreground"}
+                        aria-hidden
+                      />
+                    )}
+                    <div className="truncate text-[13px] font-medium text-foreground">
+                      {insight.label}
+                    </div>
+                  </div>
+                  <div className={`flex flex-shrink-0 items-center gap-2 text-[12px] font-semibold ${
+                    activeInsightId === insight.id ? "text-primary" : "text-muted-foreground"
+                  }`}>
+                            <span>{insight.value} users</span>
+                    <ChevronRight size={16} className={activeInsightId === insight.id ? "text-primary" : "text-muted-foreground"} />
                   </div>
                 </div>
-                <div className="text-xl font-semibold leading-none text-foreground">
-                  {insight.value}
-                </div>
-              </article>
+              </button>
             ))}
           </div>
         </aside>

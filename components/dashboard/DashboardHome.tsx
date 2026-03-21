@@ -2,10 +2,9 @@
 
 import { CurrentMonthEarningCard } from "./CurrentMonthEarningCard";
 import { PayoutSummaryCard } from "./PayoutSummaryCard";
-import { NewClientOnboardingCard } from "./NewClientOnboardingCard";
-import { ClientReferralLinkCard } from "./ClientReferralLinkCard";
 import { BusinessOpportunitiesCard } from "./BusinessOpportunitiesCard";
-import { WealthProductsCard } from "./WealthProductsCard";
+import { MFTrailBannerCard } from "./MFTrailBannerCard";
+import { EarningPotentialCard } from "./EarningPotentialCard";
 
 export function DashboardHome() {
   return (
@@ -14,14 +13,17 @@ export function DashboardHome() {
         <div className="lg:col-span-9 flex flex-col gap-3">
           <CurrentMonthEarningCard />
           <PayoutSummaryCard />
-          <NewClientOnboardingCard />
+          <EarningPotentialCard />
+          {/* Mobile: banner appears right after Revenue Summary */}
+          <div className="lg:hidden">
+            <MFTrailBannerCard />
+          </div>
           <BusinessOpportunitiesCard />
-          <WealthProductsCard />
         </div>
 
-        <aside className="lg:col-span-3 flex flex-col gap-3">
-          <ClientReferralLinkCard />
-          <div className="h-[180px] rounded-md border border-border bg-card" />
+        {/* Desktop: banner sits in the right column, aligned with the top two sections */}
+        <aside className="hidden lg:flex lg:col-span-3 flex-col gap-3">
+          <MFTrailBannerCard />
         </aside>
       </div>
     </main>

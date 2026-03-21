@@ -6,8 +6,10 @@ import { DashboardHome } from "@/components/dashboard/DashboardHome";
 import { CustomersHome } from "@/components/customers/CustomersHome";
 import { CustomerDetailView } from "@/components/customers/CustomerDetailView";
 import { BusinessOverview } from "@/components/business/BusinessOverview";
+import { LeadsHome } from "@/components/leads/LeadsHome";
+import { ServicingHome } from "@/components/servicing/ServicingHome";
 
-type TabId = "dashboard" | "customers" | "business";
+type TabId = "dashboard" | "customers" | "servicing" | "leads" | "business";
 const BUSINESS_PILLS = [
   "Overview",
   "Report",
@@ -37,7 +39,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background pb-[calc(env(safe-area-inset-bottom)+5.25rem)] md:pb-0">
       <Header
         activeTab={activeTab}
         onTabChange={handleTabChange}
@@ -77,6 +79,8 @@ export default function Home() {
         ) : (
           <CustomersHome onSelectCustomer={setSelectedCustomerUcc} />
         ))}
+      {activeTab === "servicing" && <ServicingHome />}
+      {activeTab === "leads" && <LeadsHome />}
       {activeTab === "business" &&
         (activeBusinessPill === "Overview" ? (
           <BusinessOverview />

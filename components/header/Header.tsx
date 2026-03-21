@@ -1,7 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { Search, Bell, ChevronDown, Menu, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Search,
+  Bell,
+  ChevronDown,
+  X,
+  LayoutGrid,
+  Users,
+  HandCoins,
+  UserPlus,
+  BriefcaseBusiness,
+} from "lucide-react";
 import { UpstoxLogo } from "./UpstoxLogo";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -9,10 +19,82 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 const NAV_TABS = [
   { id: "dashboard", label: "Dashboard" },
   { id: "customers", label: "Customers" },
-  { id: "business", label: "Business" },
+  { id: "servicing", label: "Servicing" },
+  { id: "leads", label: "Leads" },
+  { id: "business", label: "My Business" },
 ] as const;
 
 type TabId = (typeof NAV_TABS)[number]["id"];
+
+const MOBILE_TAB_COPY: Record<TabId, string> = {
+  dashboard: "Dashboard",
+  customers: "Customers",
+  servicing: "Servicing",
+  leads: "Leads",
+  business: "Business",
+};
+
+function MobileTabIcon({ tabId, isActive }: { tabId: TabId; isActive: boolean }) {
+  const className = isActive ? "text-white" : "text-white/75";
+  const props = { size: 18, className };
+  if (tabId === "dashboard") return <LayoutGrid {...props} />;
+  if (tabId === "customers") return <Users {...props} />;
+  if (tabId === "servicing") return <HandCoins {...props} />;
+  if (tabId === "leads") return <UserPlus {...props} />;
+  return <BriefcaseBusiness {...props} />;
+}
+
+const DUMMY_LEADS = [
+  { id: "l1", label: "Aarti Mehta — onboarding lead" },
+  { id: "l2", label: "Vikram Sinha — KYC pending" },
+];
+
+const DUMMY_CUSTOMERS = [
+  { id: "c1", label: "UCC 100234 — Rajesh Kumar" },
+  { id: "c2", label: "UCC 100891 — Priya Nair" },
+];
+
+function SearchResultsDropdown({ className }: { className?: string }) {
+  return (
+    <div
+      role="listbox"
+      aria-label="Search results"
+      className={`absolute left-0 top-full z-50 mt-1 max-h-[min(60vh,320px)] w-full min-w-[17rem] overflow-auto rounded-lg border border-border bg-card py-2 text-card-foreground shadow-lg ${className ?? ""}`}
+    >
+      <div className="px-3 pb-1 pt-0.5">
+        <p className="text-xs font-semibold text-muted-foreground">Lead -&gt;</p>
+        <ul className="mt-1 space-y-0.5">
+          {DUMMY_LEADS.map((row) => (
+            <li key={row.id}>
+              <button
+                type="button"
+                className="w-full rounded-md px-2 py-1.5 text-left text-sm text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+              >
+                {row.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="my-2 border-t border-border" />
+      <div className="px-3 pb-1">
+        <p className="text-xs font-semibold text-muted-foreground">Customer -&gt;</p>
+        <ul className="mt-1 space-y-0.5">
+          {DUMMY_CUSTOMERS.map((row) => (
+            <li key={row.id}>
+              <button
+                type="button"
+                className="w-full rounded-md px-2 py-1.5 text-left text-sm text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+              >
+                {row.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
 
 interface HeaderProps {
   activeTab?: TabId;
@@ -27,6 +109,32 @@ export function Header({
 }: HeaderProps) {
   const [search, setSearch] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const desktopSearchRef = useRef<HTMLDivElement>(null);
+  const mobileSearchRef = useRef<HTMLDivElement>(null);
+
+  const showSearchResults = search.trim().length > 0;
+
+  const closeSearchOnOutside = useCallback((event: MouseEvent) => {
+    const t = event.target as Node;
+    if (desktopSearchRef.current?.contains(t)) return;
+    if (mobileSearchRef.current?.contains(t)) return;
+    setSearch("");
+  }, []);
+
+  useEffect(() => {
+    if (!showSearchResults) return;
+    document.addEventListener("mousedown", closeSearchOnOutside);
+    return () => document.removeEventListener("mousedown", closeSearchOnOutside);
+  }, [showSearchResults, closeSearchOnOutside]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || !search.trim()) return;
+      setSearch("");
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [search]);
 
   return (
     <header className="w-full" style={{ backgroundColor: "var(--color-brand)" }}>
@@ -69,18 +177,28 @@ export function Header({
         </nav>
 
         {/* Desktop search */}
-        <div className="hidden md:relative md:flex items-center w-56 shrink-0 ml-auto">
-          <Search
-            size={14}
-            className="absolute left-3 text-white/40 pointer-events-none"
-          />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search customers, products…"
-            className="pl-8 pr-3 h-8 text-sm rounded-full border-0 text-white placeholder:text-white/35 focus-visible:ring-1 focus-visible:ring-primary"
-            style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
-          />
+        <div ref={desktopSearchRef} className="hidden md:block w-56 shrink-0 ml-auto">
+          <div className="relative w-full">
+            <Search
+              size={14}
+              className="absolute left-3 top-1/2 z-[1] -translate-y-1/2 text-white/40 pointer-events-none"
+            />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search customers, products…"
+              className="pl-8 pr-3 h-8 text-sm rounded-full border-0 text-white placeholder:text-white/35 focus-visible:ring-1 focus-visible:ring-primary w-full"
+              style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
+              aria-expanded={showSearchResults}
+              aria-controls="header-search-results-desktop"
+              autoComplete="off"
+            />
+            {showSearchResults && (
+              <div id="header-search-results-desktop">
+                <SearchResultsDropdown />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right side: bell + avatar + mobile menu toggle */}
@@ -132,10 +250,10 @@ export function Header({
           className="md:hidden px-4 pb-3"
           style={{ backgroundColor: "var(--color-brand)" }}
         >
-          <div className="relative flex items-center">
+          <div ref={mobileSearchRef} className="relative w-full">
             <Search
               size={14}
-              className="absolute left-3 text-white/40 pointer-events-none"
+              className="absolute left-3 top-1/2 z-[1] -translate-y-1/2 text-white/40 pointer-events-none"
             />
             <Input
               value={search}
@@ -144,14 +262,22 @@ export function Header({
               className="pl-8 pr-3 h-9 text-sm rounded-full border-0 text-white placeholder:text-white/35 w-full focus-visible:ring-1 focus-visible:ring-primary"
               style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
               autoFocus
+              aria-expanded={showSearchResults}
+              aria-controls="header-search-results-mobile"
+              autoComplete="off"
             />
+            {showSearchResults && (
+              <div id="header-search-results-mobile">
+                <SearchResultsDropdown className="min-w-0 w-full" />
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* Mobile nav tab strip */}
+      {/* Mobile bottom nav tab strip */}
       <div
-        className="flex md:hidden border-t border-white/20 overflow-x-auto"
+        className="fixed inset-x-0 bottom-0 z-40 flex md:hidden border-t border-white/20 shadow-[0_-8px_24px_rgba(0,0,0,0.22)] pb-[calc(env(safe-area-inset-bottom)+0.35rem)] pt-1 px-1"
         style={{ backgroundColor: "var(--color-brand)" }}
       >
         {NAV_TABS.map((tab) => {
@@ -160,15 +286,15 @@ export function Header({
             <button
               key={tab.id}
               onClick={() => onTabChange?.(tab.id)}
-              className="relative flex-1 min-w-[80px] py-3 text-[13px] font-medium whitespace-nowrap text-center"
-              style={{
-                color: isActive ? "white" : "rgba(255,255,255,0.6)",
-              }}
+              className={`relative flex flex-1 min-w-0 flex-col items-center justify-center gap-1 rounded-lg py-2 text-[11px] font-medium leading-none transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+                isActive ? "bg-white/12 text-white" : "text-white/70"
+              }`}
             >
-              {tab.label}
+              <MobileTabIcon tabId={tab.id} isActive={isActive} />
+              <span className="truncate max-w-full px-1">{MOBILE_TAB_COPY[tab.id]}</span>
               {isActive && (
                 <span
-                  className="absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full"
+                  className="absolute bottom-0 left-2 right-2 h-[2px] rounded-t-full"
                   style={{ backgroundColor: "var(--color-brand-light)" }}
                 />
               )}

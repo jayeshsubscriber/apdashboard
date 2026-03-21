@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { ChevronRight, Eye, EyeOff, UserPlus } from "lucide-react";
 import { onboardingRows, onboardingSteps, type OnboardingStatus } from "../data";
 
 const STATUS_FILTERS: OnboardingStatus[] = ["Open", "Rejected", "Scrutiny"];
@@ -81,7 +81,10 @@ export function ClientOnboardingLeadsPanel() {
   return (
     <section className="p-3">
       <div className="px-0 py-0">
-        <h3 className="text-base font-semibold tracking-tight text-foreground">Client Onboarding Leads</h3>
+        <h3 className="flex items-center gap-2 border-l-[3px] border-primary pl-3 text-lg font-semibold tracking-tight text-foreground">
+          <UserPlus size={18} className="text-primary shrink-0" />
+          Client Onboarding Leads
+        </h3>
         <div className="mt-1 text-xs text-muted-foreground">The report contains lead data for 30 days and refreshes every 15 minutes.</div>
       </div>
       {/* Mobile: horizontal scrollable step pills (hidden on xl+) */}
@@ -122,11 +125,11 @@ export function ClientOnboardingLeadsPanel() {
       </div>
 
       <div className="mt-3 grid grid-cols-1 gap-3 xl:grid-cols-[300px_minmax(0,1fr)]">
-        <aside className="hidden xl:block rounded-md border border-border bg-card p-2.5">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-semibold text-muted-foreground">Steps</span>
+        <aside className="hidden xl:block rounded-md border border-border bg-card overflow-hidden">
+          <div className="p-3 border-b border-border bg-muted/20">
+            <div className="text-xs font-semibold text-muted-foreground">Steps</div>
           </div>
-          <div className="space-y-2">
+          <div className="p-3 space-y-2">
             {onboardingSteps.map((step) => {
               const isSelected = activeStep === step.id;
               return (
@@ -134,31 +137,25 @@ export function ClientOnboardingLeadsPanel() {
                   key={step.id}
                   type="button"
                   onClick={() => handleStepClick(step.id)}
-                  className={`flex w-full items-center justify-between gap-2 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
+                  className={`w-full text-left rounded-md px-3 py-2 transition-colors ${
                     isSelected
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+                      ? "bg-primary/5"
+                      : "bg-background hover:bg-muted/30"
                   }`}
                 >
-                  <span className="truncate">{step.id}. {step.title}</span>
-                  <span className="ml-auto inline-flex items-center gap-1">
-                    <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-semibold text-primary-foreground">
-                      {stepCounts.get(step.id) ?? 0}
-                    </span>
-                    <span
-                      role="button"
-                      aria-label={`Clear ${step.title} filter`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveStep(null);
-                      }}
-                      className={`inline-flex h-4 w-4 items-center justify-center rounded-full border text-[10px] leading-none ${
-                        isSelected ? "border-primary/40 text-primary" : "border-transparent text-transparent"
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="truncate text-[13px] font-medium text-foreground">
+                      {step.id}. {step.title}
+                    </div>
+                    <div
+                      className={`flex flex-shrink-0 items-center gap-2 text-[12px] font-semibold ${
+                        isSelected ? "text-primary" : "text-muted-foreground"
                       }`}
                     >
-                      ×
-                    </span>
-                  </span>
+                      <span>{stepCounts.get(step.id) ?? 0} users</span>
+                      <ChevronRight size={16} className={isSelected ? "text-primary" : "text-muted-foreground"} />
+                    </div>
+                  </div>
                 </button>
               );
             })}

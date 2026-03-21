@@ -1,15 +1,47 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { BarChart3 } from "lucide-react";
 import {
   Bar,
   BarChart,
   CartesianGrid,
+  LabelList,
   Legend,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+
+function CustomTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: Array<{ name: string; value: number; color: string }>;
+  label?: string;
+}) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="rounded-md border border-border bg-card shadow-md px-3 py-2 text-sm">
+      <p className="font-semibold text-foreground mb-1">{label}</p>
+      {payload.map((entry) => (
+        <div key={entry.name} className="flex items-center gap-2">
+          <span
+            className="inline-block w-2.5 h-2.5 rounded-sm shrink-0"
+            style={{ background: entry.color }}
+          />
+          <span className="text-muted-foreground">{entry.name}:</span>
+          <span className="font-medium text-foreground">
+            ₹{entry.value.toLocaleString("en-IN")}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 const allMonths = [
   "March 2023",
@@ -35,12 +67,20 @@ const RANGE_OPTIONS: Array<{ id: RangeId; label: string; count: number }> = [
 ];
 
 const SERIES_COLORS = {
-  referralFee: "#6b2ba8",
-  brokerage: "#542087",
-  mfCommission: "#8b5cf6",
-  other: "#a78bfa",
-  consolidated: "#542087",
+  referralFee: "#f97316",  // orange
+  brokerage: "#6366f1",    // indigo
+  mfCommission: "#06b6d4", // cyan
+  other: "#f59e0b",        // amber
+  consolidated: "#6366f1",
 } as const;
+
+function formatBarLabel(value: number) {
+  if (value >= 1000) {
+    const k = value / 1000;
+    return `${k % 1 === 0 ? k : k.toFixed(1)}k`;
+  }
+  return String(value);
+}
 const BAR_WIDTH = 26;
 
 // Realistic (dummy) payout figures per month until backend wiring.
@@ -95,7 +135,7 @@ export function PayoutSummaryCard() {
     }));
   }, [months]);
 
-  const tickInterval = months.length <= 6 ? 0 : 2;
+  const tickInterval = 0;
   const maxValue = showConsolidatedIncome
     ? Math.max(...data.map((d) => d.consolidatedIncome), 100)
     : Math.max(
@@ -104,34 +144,35 @@ export function PayoutSummaryCard() {
         ),
         100
       );
-  const chartMax = Math.ceil(maxValue / 10000) * 10000;
+  const chartMax = Math.ceil(maxValue / 10000) * 10000 + 5000;
 
   return (
-    <section className="rounded-md border border-border bg-card overflow-hidden">
+    <section className="min-w-0 overflow-hidden">
       <div className="p-5">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-foreground tracking-tight">
+            <h2 className="flex items-center gap-2 border-l-[3px] border-primary pl-3 text-lg font-semibold text-foreground tracking-tight">
+              <BarChart3 size={18} className="text-primary shrink-0" />
               Revenue Summary
             </h2>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 sm:shrink-0">
-            <label className="inline-flex items-center gap-2 text-sm text-muted-foreground cursor-pointer select-none">
+            <label className="inline-flex items-center gap-2 text-sm cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={showConsolidatedIncome}
                 onChange={(e) => setShowConsolidatedIncome(e.target.checked)}
-                className="h-4 w-4 rounded border-border text-primary focus-visible:ring-1 focus-visible:ring-primary"
+                className="h-4 w-4 rounded border-primary/40 text-primary focus-visible:ring-1 focus-visible:ring-primary"
               />
-              Consolidated Income
+              <span className="font-medium text-foreground">Consolidated Income</span>
             </label>
 
             <select
               aria-label="Time interval"
               value={rangeId}
               onChange={(e) => setRangeId(e.target.value as RangeId)}
-              className="h-9 rounded-md border border-border bg-card px-3 text-sm text-muted-foreground outline-none focus-visible:ring-1 focus-visible:ring-primary"
+              className="h-9 rounded-md border border-primary/30 bg-primary/10 px-3 text-sm font-medium text-primary outline-none focus-visible:ring-1 focus-visible:ring-primary"
             >
               {RANGE_OPTIONS.map((opt) => (
                 <option key={opt.id} value={opt.id}>
@@ -146,7 +187,7 @@ export function PayoutSummaryCard() {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data}
-              margin={{ top: 6, right: 18, left: 0, bottom: 0 }}
+              margin={{ top: 20, right: 18, left: 0, bottom: 0 }}
               barGap={6}
               barCategoryGap="15%"
             >
@@ -162,7 +203,11 @@ export function PayoutSummaryCard() {
                 interval={tickInterval}
                 tickLine={false}
                 axisLine={false}
-                tick={{ fontSize: 14, fill: "#6b7280" }}
+                tick={{ fontSize: 12, fill: "#6b7280" }}
+                tickFormatter={(val: string) => {
+                  const [month, year] = val.split(" ");
+                  return `${month.slice(0, 3)} '${year.slice(2)}`;
+                }}
               />
               <YAxis
                 tickLine={false}
@@ -172,6 +217,8 @@ export function PayoutSummaryCard() {
                 domain={[0, chartMax]}
                 tickFormatter={formatMoney}
               />
+
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(0,0,0,0.04)" }} />
 
               {!showConsolidatedIncome && (
                 <Legend
@@ -191,7 +238,9 @@ export function PayoutSummaryCard() {
                   barSize={BAR_WIDTH}
                   minPointSize={3}
                   radius={[4, 4, 0, 0]}
-                />
+                >
+                  <LabelList dataKey="consolidatedIncome" position="top" formatter={formatBarLabel} style={{ fontSize: 10, fill: "#6b7280" }} />
+                </Bar>
               )}
 
               {!showConsolidatedIncome && (
@@ -202,7 +251,9 @@ export function PayoutSummaryCard() {
                   barSize={BAR_WIDTH}
                   minPointSize={3}
                   radius={[4, 4, 0, 0]}
-                />
+                >
+                  <LabelList dataKey="referralFee" position="top" formatter={formatBarLabel} style={{ fontSize: 10, fill: "#6b7280" }} />
+                </Bar>
               )}
               {!showConsolidatedIncome && (
                 <Bar
@@ -212,7 +263,9 @@ export function PayoutSummaryCard() {
                   barSize={BAR_WIDTH}
                   minPointSize={3}
                   radius={[4, 4, 0, 0]}
-                />
+                >
+                  <LabelList dataKey="brokerage" position="top" formatter={formatBarLabel} style={{ fontSize: 10, fill: "#6b7280" }} />
+                </Bar>
               )}
               {!showConsolidatedIncome && (
                 <Bar
@@ -222,7 +275,9 @@ export function PayoutSummaryCard() {
                   barSize={BAR_WIDTH}
                   minPointSize={3}
                   radius={[4, 4, 0, 0]}
-                />
+                >
+                  <LabelList dataKey="mfCommission" position="top" formatter={formatBarLabel} style={{ fontSize: 10, fill: "#6b7280" }} />
+                </Bar>
               )}
               {!showConsolidatedIncome && (
                 <Bar
@@ -232,7 +287,9 @@ export function PayoutSummaryCard() {
                   barSize={BAR_WIDTH}
                   minPointSize={3}
                   radius={[4, 4, 0, 0]}
-                />
+                >
+                  <LabelList dataKey="other" position="top" formatter={formatBarLabel} style={{ fontSize: 10, fill: "#6b7280" }} />
+                </Bar>
               )}
             </BarChart>
           </ResponsiveContainer>

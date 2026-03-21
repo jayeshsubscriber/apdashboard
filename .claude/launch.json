@@ -4,11 +4,11 @@
     {
       "name": "AP Dashboard",
       "runtimeExecutable": "/Users/jayeshruchandani/.nvm/versions/node/v20.19.5/bin/node",
-      "runtimeArgs": ["/Users/jayeshruchandani/Desktop/Cursor projects/AP Dashboard/node_modules/next/dist/bin/next", "dev"],
+      "runtimeArgs": ["/Users/jayeshruchandani/Desktop/Cursor projects/AP Dashboard/node_modules/next/dist/bin/next", "dev", "--port", "3001"],
       "env": {
         "PATH": "/Users/jayeshruchandani/.nvm/versions/node/v20.19.5/bin:/usr/local/bin:/usr/bin:/bin"
       },
-      "port": 3000
+      "port": 3001
     }
   ]
 }

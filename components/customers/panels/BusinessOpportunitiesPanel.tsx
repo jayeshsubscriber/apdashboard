@@ -15,18 +15,10 @@ import {
 } from "lucide-react";
 import {
   BUSINESS_CATEGORIES,
-  BUSINESS_SECTIONS,
   BusinessCategoryId,
   BusinessColumn,
   BusinessRow,
-  BusinessSectionId,
 } from "../businessOpportunitiesData";
-
-function sectionIcon(section: BusinessSectionId) {
-  if (section === "atRisk") return AlertTriangle;
-  if (section === "activation") return UserCheck;
-  return BarChart3;
-}
 
 function leftIconForCard(cardId: string) {
   if (cardId === "likelyToLapse") return AlertTriangle;
@@ -42,28 +34,45 @@ function leftIconForCard(cardId: string) {
   return PieChart; // mf
 }
 
+const CATEGORY_GROUPS: Array<{
+  title: string;
+  cardIds: BusinessCategoryId[];
+  suggestions?: string[];
+}> = [
+  {
+    title: "Activation",
+    cardIds: ["onboardedNotActivated", "neverTraded"],
+  },
+  {
+    title: "At Risk",
+    cardIds: ["likelyToLapse", "highFnOLosses", "topFive"],
+  },
+  {
+    title: "Upsell",
+    cardIds: ["equityPotential", "mtf", "fno", "intraday", "mf"],
+  },
+  {
+    title: "Cross-sell",
+    cardIds: ["ipo"],
+    suggestions: [
+      "Debt MF / Liquid Fund Prospects",
+      "Insurance and Protection Prospects",
+      "NPS Prospects",
+      "Loan Against Securities Prospects",
+    ],
+  },
+];
+
 export function BusinessOpportunitiesPanel() {
   const allCards = useMemo(() => BUSINESS_CATEGORIES, []);
 
   const [activeCardId, setActiveCardId] = useState<BusinessCategoryId>(
-    allCards[0]?.id ?? "onboardedNotActivated"
+    CATEGORY_GROUPS[0].cardIds[0]
   );
 
   const activeCard = useMemo(
     () => allCards.find((c) => c.id === activeCardId) ?? allCards[0],
     [allCards, activeCardId]
-  );
-
-  const cardsBySection = useMemo(
-    () =>
-      allCards.reduce<Record<BusinessSectionId, typeof allCards>>(
-        (acc, card) => {
-          acc[card.section].push(card);
-          return acc;
-        },
-        { activation: [], atRisk: [], crossSell: [] }
-      ),
-    [allCards]
   );
 
   const gridTemplateColumns = useMemo(() => {
@@ -124,68 +133,77 @@ export function BusinessOpportunitiesPanel() {
     return <div className={`text-[13px] text-foreground truncate ${cellTextClass(column)}`}>{value}</div>;
   };
 
+  const groupedCards = useMemo(
+    () =>
+      CATEGORY_GROUPS.map((group) => ({
+        ...group,
+        cards: group.cardIds
+          .map((id) => allCards.find((card) => card.id === id))
+          .filter((card): card is (typeof allCards)[number] => Boolean(card)),
+      })),
+    [allCards]
+  );
+
   return (
     <section className="p-3">
       <h3 className="text-base font-semibold tracking-tight text-foreground">Business Opportunities</h3>
 
       <div className="mt-3">
-        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[260px_minmax(0,1fr)] items-stretch">
+        <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-[300px_minmax(0,1fr)] items-stretch">
           <aside className="rounded-md border border-border bg-card overflow-hidden min-w-0">
             <div className="p-3 border-b border-border bg-muted/20">
               <div className="text-xs font-semibold text-muted-foreground">Categories</div>
             </div>
-            <div className="p-3 space-y-5 max-h-[240px] overflow-y-auto md:max-h-none">
-              {BUSINESS_SECTIONS.map((group) => {
-                const groupCards = cardsBySection[group.id];
-                return (
-                  <div key={group.id} className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      {(() => {
-                        const Icon = sectionIcon(group.id);
-                        return <Icon size={16} className="text-primary" aria-hidden />;
-                      })()}
-                      <div className="min-w-0">
-                        <div className="text-sm font-semibold text-foreground truncate">{group.label}</div>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      {groupCards.map((c) => {
-                        const isActive = c.id === activeCard?.id;
-                        const Icon = leftIconForCard(c.id);
-                        return (
-                          <button
-                            key={c.id}
-                            type="button"
-                            onClick={() => setActiveCardId(c.id)}
-                            className={`w-full text-left rounded-md px-3 py-2 transition-colors ${
-                              isActive
-                                ? "bg-primary/5"
-                                : "bg-background hover:bg-muted/30"
+            <div className="p-3 space-y-2 max-h-[240px] overflow-y-auto xl:max-h-none">
+              {groupedCards.map((group) => (
+                <div key={group.title} className="space-y-2">
+                  <div className="px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    {group.title}
+                  </div>
+
+                  {group.cards.map((c) => {
+                    const isActive = c.id === activeCard?.id;
+                    const Icon = leftIconForCard(c.id);
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => setActiveCardId(c.id)}
+                        className={`w-full text-left rounded-md px-3 py-2 transition-colors ${
+                          isActive ? "bg-primary/5" : "bg-background hover:bg-muted/30"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex min-w-0 items-center gap-2">
+                            <Icon size={16} className={isActive ? "text-primary" : "text-muted-foreground"} />
+                            <div className="truncate text-[13px] font-medium text-foreground">{c.title}</div>
+                          </div>
+                          <div
+                            className={`flex flex-shrink-0 items-center gap-2 text-[12px] font-semibold ${
+                              isActive ? "text-primary" : "text-muted-foreground"
                             }`}
                           >
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="flex min-w-0 items-center gap-2">
-                                <Icon size={16} className={isActive ? "text-primary" : "text-muted-foreground"} />
-                                <div className="truncate text-[13px] font-medium text-foreground">{c.title}</div>
-                              </div>
-                              <div
-                                className={`flex flex-shrink-0 items-center gap-2 text-[12px] font-semibold ${
-                                  isActive ? "text-primary" : "text-muted-foreground"
-                                }`}
-                              >
-                                <span>
-                                  {c.totalClients} users
-                                </span>
-                                <ChevronRight size={16} className={isActive ? "text-primary" : "text-muted-foreground"} />
-                              </div>
-                            </div>
-                          </button>
-                        );
-                      })}
+                            <span>{c.totalClients} users</span>
+                            <ChevronRight
+                              size={16}
+                              className={isActive ? "text-primary" : "text-muted-foreground"}
+                            />
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+
+                  {group.suggestions?.map((suggestion) => (
+                    <div
+                      key={suggestion}
+                      className="rounded-md border border-dashed border-border px-3 py-2 text-[12px] text-muted-foreground"
+                    >
+                      {suggestion}
                     </div>
-                  </div>
-                );
-              })}
+                  ))}
+                </div>
+              ))}
             </div>
           </aside>
 

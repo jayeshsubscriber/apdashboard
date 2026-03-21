@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { UserPlus } from "lucide-react";
 import {
   Pie,
   PieChart,
@@ -28,8 +29,6 @@ type StatusDatum = {
 export function NewClientOnboardingCard() {
   // Dummy values until backend data is wired.
   const [rangeId, setRangeId] = useState<RangeId>("last60");
-
-  const lastUpdatedText = "Last Updated: 6th Feb, 2023, 8:00 AM";
 
   const totalOpenAndProgress = 39675;
   const accountOpen = 37069;
@@ -87,17 +86,15 @@ export function NewClientOnboardingCard() {
   const maxAppValue = Math.max(...appStatusData.map((d) => d.value), 1);
 
   return (
-    <section className="rounded-md border border-border bg-card overflow-visible">
+    <section className="min-w-0 overflow-visible">
       <div className="p-5">
         {/* Master header */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold text-foreground tracking-tight">
+            <h2 className="flex items-center gap-2 border-l-[3px] border-primary pl-3 text-lg font-semibold text-foreground tracking-tight">
+              <UserPlus size={18} className="text-primary shrink-0" />
               New Client Onboarding
             </h2>
-            <div className="mt-1 text-sm text-muted-foreground">
-              {lastUpdatedText}
-            </div>
           </div>
 
           <div className="shrink-0">
@@ -105,7 +102,7 @@ export function NewClientOnboardingCard() {
               aria-label="Onboarding range"
               value={rangeId}
               onChange={(e) => setRangeId(e.target.value as RangeId)}
-              className="h-9 rounded-md border border-border bg-card px-4 text-sm text-muted-foreground outline-none focus-visible:ring-1 focus-visible:ring-primary"
+              className="h-9 rounded-md border border-primary/30 bg-primary/10 px-4 text-sm font-medium text-primary outline-none focus-visible:ring-1 focus-visible:ring-primary"
             >
               {RANGE_OPTIONS.map((opt) => (
                 <option key={opt.id} value={opt.id}>
@@ -119,7 +116,7 @@ export function NewClientOnboardingCard() {
         {/* Two inner sections */}
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* Left: Account status summary */}
-          <div className="rounded-md border border-border bg-card p-4">
+          <div className="min-w-0 p-4">
             <h3 className="text-base font-semibold text-foreground tracking-tight">
               Client Onboarding Account Status Summary
             </h3>
@@ -169,7 +166,7 @@ export function NewClientOnboardingCard() {
           </div>
 
           {/* Right: App status summary (placeholder) */}
-          <div className="rounded-md border border-border bg-card p-4">
+          <div className="min-w-0 p-4">
             <h3 className="text-base font-semibold text-foreground tracking-tight">
               Client Onboarding App Status Summary
             </h3>

@@ -1,9 +1,10 @@
 "use client";
 
-function formatMoney2(v: number) {
+import { IndianRupee } from "lucide-react";
+
+function formatMoney(v: number) {
   return v.toLocaleString("en-IN", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    maximumFractionDigits: 0,
   });
 }
 
@@ -11,16 +12,17 @@ export function CurrentMonthEarningCard() {
   // Dummy values until real metrics are wired.
   const accountsOpened = 128;
   const tradeActiveAccounts = 44;
-  const flatIncome = 25340.5;
+  const referralIncome = 25340.5;
   const totalIncome = 27874.2;
 
   return (
-    <section className="rounded-md border border-border bg-card overflow-hidden">
+    <section className="min-w-0 overflow-hidden">
       <div className="p-4">
         <div className="flex items-start">
           <div>
-            <h2 className="text-base font-semibold text-foreground">
-              Current Month Earning - MTD
+            <h2 className="flex items-center gap-2 border-l-[3px] border-primary pl-3 text-base font-semibold text-foreground">
+              <IndianRupee size={16} className="text-primary shrink-0" />
+              MTD Summary
             </h2>
           </div>
         </div>
@@ -43,15 +45,15 @@ export function CurrentMonthEarningCard() {
             </div>
           </div>
           <div>
-            <div className="text-sm text-muted-foreground font-medium">Flat Income</div>
+            <div className="text-sm text-muted-foreground font-medium">Referral Income</div>
             <div className="mt-1 text-2xl font-semibold text-foreground leading-none">
-              {formatMoney2(flatIncome)}
+              ₹{formatMoney(referralIncome)}
             </div>
           </div>
           <div>
             <div className="text-sm text-muted-foreground font-medium">Total Income</div>
             <div className="mt-1 text-2xl font-semibold text-foreground leading-none">
-              {formatMoney2(totalIncome)}
+              ₹{formatMoney(totalIncome)}
             </div>
           </div>
         </div>
