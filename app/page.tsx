@@ -40,6 +40,7 @@ export default function Home() {
   const handleTabChange = (tab: TabId) => {
     setActiveTab(tab);
     if (tab !== "customers") setSelectedCustomerUcc(null);
+    window.scrollTo({ top: 0, behavior: "instant" });
   };
 
   return (
@@ -58,7 +59,7 @@ export default function Home() {
               return (
                 <button
                   key={pill}
-                  onClick={() => setActiveBusinessPill(pill)}
+                  onClick={() => { setActiveBusinessPill(pill); window.scrollTo({ top: 0, behavior: "instant" }); }}
                   className={`h-8 rounded-full px-3 text-xs font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
                     isActive
                       ? "bg-primary text-primary-foreground"
