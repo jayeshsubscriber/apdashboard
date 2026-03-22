@@ -29,17 +29,13 @@ export function CurrentMonthEarningCard() {
 
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-4">
           <div>
-            <div className="text-sm text-muted-foreground font-medium">
-              Number of Accounts Opened
-            </div>
+            <div className="text-sm text-muted-foreground font-medium">Accounts Opened</div>
             <div className="mt-1 text-2xl font-semibold text-foreground leading-none">
               {accountsOpened}
             </div>
           </div>
           <div>
-            <div className="text-sm text-muted-foreground font-medium">
-              Number of Trade Active Accounts
-            </div>
+            <div className="text-sm text-muted-foreground font-medium">Active Clients (Traded)</div>
             <div className="mt-1 text-2xl font-semibold text-foreground leading-none">
               {tradeActiveAccounts}
             </div>

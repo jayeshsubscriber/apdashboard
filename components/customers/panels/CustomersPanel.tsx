@@ -4,7 +4,6 @@ import {
   AlertTriangle,
   Ban,
   ChevronRight,
-  Eye,
   TrendingUp,
   UserCheck,
   UserX,
@@ -19,7 +18,6 @@ type CustomerInsightId = (typeof customerInsights)[number]["id"];
 export function CustomersPanel({ onSelectCustomer }: Props) {
   const pageSize = 20;
   const [page, setPage] = useState(1);
-  const [viewAll, setViewAll] = useState(false);
   const [activeInsightId, setActiveInsightId] = useState<CustomerInsightId>(
     customerInsights[0]?.id ?? "totalClients"
   );
@@ -58,12 +56,11 @@ export function CustomersPanel({ onSelectCustomer }: Props) {
   }, [filteredCustomers]);
 
   const visibleCustomers = useMemo(() => {
-    if (viewAll) return filteredCustomers;
     const start = (page - 1) * pageSize;
     return filteredCustomers.slice(start, start + pageSize);
-  }, [filteredCustomers, page, viewAll]);
+  }, [filteredCustomers, page]);
 
-  const canPaginate = filteredCustomers.length > pageSize && !viewAll;
+  const canPaginate = filteredCustomers.length > pageSize;
 
   return (
     <section className="p-3">
@@ -72,34 +69,36 @@ export function CustomersPanel({ onSelectCustomer }: Props) {
           <Users size={18} className="text-primary shrink-0" />
           Customers
         </h3>
-        {customerRows.length > pageSize && !viewAll && (
-          <button
-            type="button"
-            onClick={() => {
-              setViewAll(true);
-              setPage(1);
-            }}
-            className="h-8 rounded-md bg-primary px-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
-          >
-            View all
-          </button>
-        )}
-        {customerRows.length > pageSize && viewAll && (
-          <button
-            type="button"
-            onClick={() => {
-              setViewAll(false);
-              setPage(1);
-            }}
-            className="h-8 rounded-md border border-border bg-background px-3 text-sm font-semibold text-foreground hover:bg-muted"
-          >
-            Show 20
-          </button>
-        )}
+      </div>
+
+      {/* Mobile-only: pills row */}
+      <div className="lg:hidden mt-3 flex gap-2 overflow-x-auto pb-4">
+        {customerInsights.map((insight) => {
+          const isActive = activeInsightId === insight.id;
+          return (
+            <button
+              key={insight.id}
+              type="button"
+              onClick={() => { setActiveInsightId(insight.id); setPage(1); }}
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-md border px-3 py-1 text-xs font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+                isActive
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-background text-foreground hover:bg-muted"
+              }`}
+            >
+              {insight.label}
+              <span className={`inline-flex items-center justify-center rounded px-1.5 py-0.5 text-[10px] font-bold leading-none ${
+                isActive ? "bg-white/25 text-white" : "bg-primary/10 text-primary"
+              }`}>
+                {insight.value}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-[280px_minmax(0,1fr)] items-start">
-        <aside className="sticky top-24 self-start rounded-md border border-border bg-card">
+        <aside className="hidden lg:block sticky top-[56px] self-start rounded-md border border-border bg-card">
           <div className="p-3 border-b border-border bg-muted/20">
             <div className="text-xs font-semibold text-muted-foreground">Overview</div>
           </div>
@@ -111,7 +110,6 @@ export function CustomersPanel({ onSelectCustomer }: Props) {
                 onClick={() => {
                   setActiveInsightId(insight.id);
                   setPage(1);
-                  setViewAll(false);
                 }}
                 className={`w-full text-left rounded-md px-3 py-2 transition-colors ${
                   activeInsightId === insight.id
@@ -161,9 +159,9 @@ export function CustomersPanel({ onSelectCustomer }: Props) {
 
         <div className="min-w-0">
           <div className="overflow-x-auto rounded-md border border-border">
-            <div className="min-w-[1200px]">
-            <div className="grid grid-cols-[140px_1fr_150px_120px_170px_190px_220px_260px] border-b border-border bg-muted/20 px-3 py-2 text-xs font-semibold text-muted-foreground">
-              <div className="sticky left-0 bg-muted/20 z-10">UCC</div>
+            <div className="min-w-[1410px]">
+            <div className="grid grid-cols-[140px_160px_150px_120px_170px_190px_220px_260px] border-b border-border bg-muted/20 px-3 py-2 text-xs font-semibold text-muted-foreground">
+              <div className="sticky left-0 bg-slate-50 z-10">UCC</div>
               <div>Client Name</div>
               <div>Equity AUM</div>
               <div>MF AUM</div>
@@ -183,34 +181,28 @@ export function CustomersPanel({ onSelectCustomer }: Props) {
             {visibleCustomers.map((r) => (
               <div
                 key={r.ucc}
-                className="grid grid-cols-[140px_1fr_150px_120px_170px_190px_220px_260px] items-start border-b border-border px-3 py-2 text-[13px] last:border-b-0"
+                role="button"
+                tabIndex={0}
+                onClick={() => onSelectCustomer(r.ucc)}
+                onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onSelectCustomer(r.ucc)}
+                className="group grid grid-cols-[140px_160px_150px_120px_170px_190px_220px_260px] items-start border-b border-border px-3 py-2 text-[13px] last:border-b-0 cursor-pointer hover:bg-primary/5 transition-colors"
               >
-                <div className="sticky left-0 bg-card z-10 truncate">{r.ucc}</div>
+                <div className="sticky left-0 bg-white z-10 truncate transition-colors group-hover:bg-primary/5">{r.ucc}</div>
                 <div className="truncate">{r.name}</div>
                 <div className="text-muted-foreground">{r.equityAum}</div>
                 <div className="text-muted-foreground">{r.mfAum}</div>
                 <div>{r.lastTradedDate}</div>
                 <div className="text-muted-foreground">{r.brokerageGeneratedLast30Days}</div>
                 <div className="text-muted-foreground">{r.totalRevenueGeneratedLast30Days}</div>
-                <div className="flex items-start gap-2">
-                  <button
-                    type="button"
-                    onClick={() => onSelectCustomer(r.ucc)}
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border hover:bg-primary/5"
-                    aria-label="View customer"
-                  >
-                    <Eye size={16} className="text-primary" />
-                  </button>
-                  <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                    {r.suggestedActions.map((action) => (
-                      <span
-                        key={`${r.ucc}-${action}`}
-                        className="inline-flex rounded-sm border border-border bg-muted/20 px-2 py-0.5 text-[11px] font-semibold text-foreground"
-                      >
-                        {action}
-                      </span>
-                    ))}
-                  </div>
+                <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                  {r.suggestedActions.map((action) => (
+                    <span
+                      key={`${r.ucc}-${action}`}
+                      className="inline-flex rounded-sm border border-border bg-muted/20 px-2 py-0.5 text-[11px] font-semibold text-foreground"
+                    >
+                      {action}
+                    </span>
+                  ))}
                 </div>
               </div>
             ))}

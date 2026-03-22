@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { ArrowLeft, Download } from "lucide-react";
 import { getCustomerDetail } from "./customer-detail-data";
 import { ClientProfileCard } from "./detail/ClientProfileCard";
@@ -19,6 +20,8 @@ type Props = {
 const REPORTS = ["P&L Report", "Trade Report", "Holding Report"] as const;
 
 export function CustomerDetailView({ ucc, onBack }: Props) {
+  useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); }, [ucc]);
+
   const detail = getCustomerDetail(ucc);
 
   if (!detail) {

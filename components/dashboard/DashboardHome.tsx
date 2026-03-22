@@ -5,8 +5,14 @@ import { PayoutSummaryCard } from "./PayoutSummaryCard";
 import { BusinessOpportunitiesCard } from "./BusinessOpportunitiesCard";
 import { MFTrailBannerCard } from "./MFTrailBannerCard";
 import { EarningPotentialCard } from "./EarningPotentialCard";
+import { SmartSuggestionsCard } from "./SmartSuggestionsCard";
+import { ProductTilesBar } from "@/components/servicing/ProductTilesBar";
 
-export function DashboardHome() {
+interface DashboardHomeProps {
+  onNavigateToServicing?: () => void;
+}
+
+export function DashboardHome({ onNavigateToServicing }: DashboardHomeProps) {
   return (
     <main className="flex-1 py-3">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
@@ -14,19 +20,21 @@ export function DashboardHome() {
           <CurrentMonthEarningCard />
           <PayoutSummaryCard />
           <EarningPotentialCard />
-          {/* Mobile: banner appears right after Revenue Summary */}
-          <div className="lg:hidden">
+          <ProductTilesBar variant="dashboard" onTileClick={onNavigateToServicing} />
+          <BusinessOpportunitiesCard />
+          {/* Mobile: Smart Suggestions + banner at bottom */}
+          <div className="lg:hidden px-4 flex flex-col gap-3">
+            <SmartSuggestionsCard />
             <MFTrailBannerCard />
           </div>
-          <BusinessOpportunitiesCard />
         </div>
 
-        {/* Desktop: banner sits in the right column, aligned with the top two sections */}
-        <aside className="hidden lg:flex lg:col-span-3 flex-col gap-3">
+        {/* Desktop: Smart Suggestions + MF banner in right column */}
+        <aside className="hidden lg:flex lg:col-span-3 flex-col gap-3 pr-4">
+          <SmartSuggestionsCard />
           <MFTrailBannerCard />
         </aside>
       </div>
     </main>
   );
 }
-

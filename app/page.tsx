@@ -6,6 +6,10 @@ import { DashboardHome } from "@/components/dashboard/DashboardHome";
 import { CustomersHome } from "@/components/customers/CustomersHome";
 import { CustomerDetailView } from "@/components/customers/CustomerDetailView";
 import { BusinessOverview } from "@/components/business/BusinessOverview";
+import { WithdrawalTab } from "@/components/business/WithdrawalTab";
+import { GSTInvoicesTab } from "@/components/business/GSTInvoicesTab";
+import { StatementTab } from "@/components/business/StatementTab";
+import { ReportTab } from "@/components/business/ReportTab";
 import { LeadsHome } from "@/components/leads/LeadsHome";
 import { ServicingHome } from "@/components/servicing/ServicingHome";
 
@@ -69,7 +73,7 @@ export default function Home() {
         </div>
       )}
 
-      {activeTab === "dashboard" && <DashboardHome />}
+      {activeTab === "dashboard" && <DashboardHome onNavigateToServicing={() => handleTabChange("servicing")} />}
       {activeTab === "customers" &&
         (selectedCustomerUcc ? (
           <CustomerDetailView
@@ -81,12 +85,19 @@ export default function Home() {
         ))}
       {activeTab === "servicing" && <ServicingHome />}
       {activeTab === "leads" && <LeadsHome />}
+      {activeTab === "business" && activeBusinessPill === "Overview" && <BusinessOverview />}
+      {activeTab === "business" && activeBusinessPill === "Report" && <ReportTab />}
+      {activeTab === "business" && activeBusinessPill === "Statement" && <StatementTab />}
+      {activeTab === "business" && activeBusinessPill === "Withdrawal" && <WithdrawalTab />}
+      {activeTab === "business" && activeBusinessPill === "GST Invoices" && <GSTInvoicesTab />}
       {activeTab === "business" &&
-        (activeBusinessPill === "Overview" ? (
-          <BusinessOverview />
-        ) : (
+        activeBusinessPill !== "Overview" &&
+        activeBusinessPill !== "Report" &&
+        activeBusinessPill !== "Statement" &&
+        activeBusinessPill !== "Withdrawal" &&
+        activeBusinessPill !== "GST Invoices" && (
           <ComingSoon title={activeBusinessPill} />
-        ))}
+        )}
     </div>
   );
 }
