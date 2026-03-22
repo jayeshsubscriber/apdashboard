@@ -18,9 +18,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const NAV_TABS = [
   { id: "dashboard", label: "Dashboard" },
+  { id: "servicing", label: "Grow" },
   { id: "customers", label: "Customers" },
-  { id: "servicing", label: "Servicing" },
-  { id: "leads", label: "Leads" },
+  { id: "leads", label: "Lead" },
   { id: "business", label: "My Business" },
 ] as const;
 
@@ -28,9 +28,9 @@ type TabId = (typeof NAV_TABS)[number]["id"];
 
 const MOBILE_TAB_COPY: Record<TabId, string> = {
   dashboard: "Dashboard",
+  servicing: "Grow",
   customers: "Customers",
-  servicing: "Servicing",
-  leads: "Leads",
+  leads: "Lead",
   business: "Business",
 };
 
@@ -143,12 +143,6 @@ export function Header({
         {/* Logo */}
         <div className="flex items-center gap-2 shrink-0">
           <UpstoxLogo />
-          <span
-            className="text-xs font-medium px-2 py-0.5 rounded-full border border-white/30 text-white/80"
-            style={{ backgroundColor: "rgba(255,255,255,0.12)" }}
-          >
-            AP Partner
-          </span>
         </div>
 
         {/* Desktop nav */}
@@ -227,7 +221,6 @@ export function Header({
               <span className="text-white text-sm font-semibold">
                 {partnerName}
               </span>
-              <span className="text-white/60 text-[11px]">AP Partner</span>
             </div>
             <ChevronDown size={14} className="hidden md:block text-white/60" />
           </button>

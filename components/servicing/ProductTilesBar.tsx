@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
-
 export type ProductCategory =
   | "advisory" | "stocks" | "mutual-funds" | "ipos"
-  | "fo" | "fixed-deposits" | "bonds" | "insurance";
+  | "fixed-deposits" | "bonds" | "insurance";
 
 // ─── Upstox-style colorful product icons ──────────────────────────────────────
 
@@ -56,20 +54,6 @@ function IllIPOs() {
   );
 }
 
-function IllFnO() {
-  return (
-    <svg viewBox="0 0 40 40" fill="none" width="32" height="32">
-      <circle cx="20" cy="20" r="16" fill="#E8F5E9"/>
-      <line x1="12" y1="10" x2="12" y2="30" stroke="#388E3C" strokeWidth="1.5"/>
-      <rect x="10" y="14" width="4" height="8" rx="0.5" fill="#388E3C"/>
-      <line x1="20" y1="8" x2="20" y2="28" stroke="#C62828" strokeWidth="1.5"/>
-      <rect x="18" y="12" width="4" height="10" rx="0.5" fill="#C62828"/>
-      <line x1="28" y1="12" x2="28" y2="32" stroke="#388E3C" strokeWidth="1.5"/>
-      <rect x="26" y="16" width="4" height="8" rx="0.5" fill="#388E3C"/>
-    </svg>
-  );
-}
-
 function IllFixedDeposits() {
   return (
     <svg viewBox="0 0 40 40" fill="none" width="32" height="32">
@@ -109,7 +93,7 @@ function IllInsurance() {
 
 const ILLUSTRATIONS: Record<ProductCategory, React.FC> = {
   advisory: IllAdvisory, stocks: IllStocks, "mutual-funds": IllMutualFunds,
-  ipos: IllIPOs, fo: IllFnO, "fixed-deposits": IllFixedDeposits,
+  ipos: IllIPOs, "fixed-deposits": IllFixedDeposits,
   bonds: IllBonds, insurance: IllInsurance,
 };
 
@@ -117,7 +101,6 @@ export const PRODUCT_CATEGORIES: Array<{ id: ProductCategory; label: string; bad
   { id: "stocks",         label: "Stocks",         badge: "Earn brokerage"   },
   { id: "mutual-funds",   label: "Mutual Funds",   badge: "Trail commission" },
   { id: "advisory",       label: "Advisory",       badge: "32 active calls"  },
-  { id: "fo",             label: "F&O",            badge: "Earn brokerage"   },
   { id: "ipos",           label: "IPOs",           badge: "2 live IPOs"      },
   { id: "fixed-deposits", label: "Fixed Dep.",     badge: "Upto 9.5% p.a."  },
   { id: "bonds",          label: "Bonds",          badge: "From ₹10,000"     },
@@ -125,20 +108,35 @@ export const PRODUCT_CATEGORIES: Array<{ id: ProductCategory; label: string; bad
 ];
 
 interface ProductTilesBarProps {
-  /** "servicing" (default) = selectable tiles with active state; "dashboard" = static tiles, white bg, click navigates away */
+  /** "servicing" = tiles scroll to sections below (no selected highlight); "dashboard" = click navigates away */
   variant?: "servicing" | "dashboard";
-  active?: ProductCategory;
+  /** Servicing: e.g. scroll to matching section id */
+  onNavigate?: (id: ProductCategory) => void;
+  /** @deprecated Prefer onNavigate */
   onSelect?: (id: ProductCategory) => void;
   /** Dashboard mode: called when any tile is clicked (navigates to Servicing) */
   onTileClick?: () => void;
 }
 
-export function ProductTilesBar({ variant = "servicing", active: activeProp, onSelect, onTileClick }: ProductTilesBarProps) {
-  const [internalActive, setInternalActive] = useState<ProductCategory>(activeProp ?? "stocks");
-  const active = activeProp ?? internalActive;
-  const handleSelect = onSelect ?? setInternalActive;
-
+export function ProductTilesBar({
+  variant = "servicing",
+  onNavigate,
+  onSelect,
+  onTileClick,
+}: ProductTilesBarProps) {
   const isDashboard = variant === "dashboard";
+
+  function handleTileClick(id: ProductCategory) {
+    if (isDashboard) {
+      onTileClick?.();
+      return;
+    }
+    if (onNavigate) {
+      onNavigate(id);
+      return;
+    }
+    onSelect?.(id);
+  }
 
   return (
     <div className="pt-4 pb-4 px-3 sm:px-4 bg-white">
@@ -152,27 +150,21 @@ export function ProductTilesBar({ variant = "servicing", active: activeProp, onS
 
       <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-1.5">
         {PRODUCT_CATEGORIES.map(({ id, label, badge }) => {
-          const isActive = !isDashboard && active === id;
           const Illustration = ILLUSTRATIONS[id];
           return (
             <button
               key={id}
-              onClick={() => isDashboard ? onTileClick?.() : handleSelect(id)}
-              className={`relative flex flex-col justify-between min-w-0 rounded-xl p-2 h-[90px] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary overflow-hidden ${
-                isActive
-                  ? "bg-white border-2 border-primary shadow-sm"
-                  : "bg-gray-50 hover:bg-gray-100 border-2 border-transparent"
-              }`}
+              type="button"
+              onClick={() => handleTileClick(id)}
+              className="relative flex h-[90px] min-w-0 flex-col justify-between overflow-hidden rounded-xl border-2 border-transparent bg-gray-50 p-2 transition-all hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
-              <span className={`text-sm sm:text-base font-bold leading-tight text-left w-full ${isActive ? "text-primary" : "text-foreground"}`}>
+              <span className="w-full text-left text-sm font-bold leading-tight text-foreground sm:text-base">
                 {label}
               </span>
 
-              <div className="flex items-end justify-between w-full">
+              <div className="flex w-full items-end justify-between">
                 <Illustration />
-                <span className={`text-[8.5px] font-semibold px-1.5 py-0.5 rounded-full leading-tight text-right ${
-                  isActive ? "bg-primary/10 text-primary" : "bg-primary/8 text-primary"
-                }`}>
+                <span className="rounded-full bg-primary/8 px-1.5 py-0.5 text-right text-[8.5px] font-semibold leading-tight text-primary">
                   {badge}
                 </span>
               </div>
