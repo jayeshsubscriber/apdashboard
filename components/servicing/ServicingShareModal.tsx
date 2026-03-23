@@ -1,15 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import {
-  Search,
-  X,
-  MessageCircle,
-  Pencil,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Search, X, MessageCircle, ArrowLeft, RotateCcw, ChevronRight } from "lucide-react";
 import { customerRows, type CustomerRow } from "@/components/customers/data";
+
+/* ─── Data ──────────────────────────────────────────────────────────────── */
 
 const CUSTOMER_PHONES: Record<string, string> = {
   SHJV1174: "919876543210",
@@ -30,7 +25,7 @@ const BUSINESS_SEGMENTS = [
   {
     id: "all",
     label: "All Clients",
-    description: "All 1,870 registered clients",
+    description: "All registered clients",
     filter: () => true,
   },
   {
@@ -53,7 +48,234 @@ const BUSINESS_SEGMENTS = [
   },
 ];
 
-type ShareModalTab = "segments" | "customers";
+type MobileStep = "message" | "customers";
+
+/* ─── Sub-components ─────────────────────────────────────────────────────── */
+
+function Avatar({ name }: { name: string }) {
+  const initials = name
+    .split(" ")
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join("")
+    .toUpperCase();
+  return (
+    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#542087]/10 text-[11px] font-semibold text-[#542087] border border-[#542087]/15">
+      {initials}
+    </div>
+  );
+}
+
+function SegmentBadge({ label }: { label: string }) {
+  const colors: Record<string, string> = {
+    "Top 5% client": "bg-[#542087]/8 text-[#542087] border-[#542087]/20",
+    "Likely to lapse": "bg-amber-50 text-amber-700 border-amber-200",
+    "High F&O Losses": "bg-red-50 text-red-600 border-red-200",
+  };
+  const cls = colors[label] ?? "bg-muted text-muted-foreground border-border";
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${cls}`}>
+      {label}
+    </span>
+  );
+}
+
+/* ─── Message Panel ───────────────────────────────────────────────────────── */
+
+function MessagePanel({
+  message,
+  editableMessage,
+  onChange,
+  onReset,
+}: {
+  message: string;
+  editableMessage: string;
+  onChange: (v: string) => void;
+  onReset: () => void;
+}) {
+  return (
+    <div className="flex flex-col h-full">
+      {/* WhatsApp header */}
+      <div className="flex items-center gap-2 px-5 py-4 border-b border-border">
+        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#25D366]/10">
+          <MessageCircle size={14} className="text-[#25D366]" />
+        </div>
+        <div>
+          <p className="text-xs font-semibold text-foreground">WhatsApp Message</p>
+          <p className="text-[10px] text-muted-foreground">Edit directly — sent as-is to each customer</p>
+        </div>
+      </div>
+
+      {/* Editable message area */}
+      <div className="flex-1 flex flex-col px-5 py-4 gap-3 overflow-hidden">
+        {/* Chat bubble background */}
+        <div className="flex-1 rounded-xl bg-[#ECF8F1] border border-[#25D366]/20 p-3 flex flex-col gap-2 overflow-hidden">
+          <textarea
+            value={editableMessage}
+            onChange={(e) => onChange(e.target.value)}
+            className="flex-1 w-full resize-none bg-transparent text-[12.5px] leading-relaxed text-[#1a1a1a] outline-none font-[inherit] placeholder:text-[#25D366]/50 min-h-0"
+            spellCheck={false}
+          />
+        </div>
+
+        {/* Actions row */}
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={onReset}
+            disabled={editableMessage === message}
+            className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            <RotateCcw size={11} />
+            Reset to default
+          </button>
+          <span className="text-[10px] text-muted-foreground">
+            {editableMessage.length} chars
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Customers Panel ─────────────────────────────────────────────────────── */
+
+function CustomersPanel({
+  editableMessage,
+}: {
+  editableMessage: string;
+  message: string;
+}) {
+  const [activeSegment, setActiveSegment] = useState("all");
+  const [search, setSearch] = useState("");
+
+  const filteredBySegment = useMemo(() => {
+    const seg = BUSINESS_SEGMENTS.find((s) => s.id === activeSegment);
+    return seg ? customerRows.filter(seg.filter) : customerRows;
+  }, [activeSegment]);
+
+  const displayedCustomers = useMemo(() => {
+    if (!search.trim()) return filteredBySegment;
+    const q = search.toLowerCase();
+    return filteredBySegment.filter(
+      (c) => c.name.toLowerCase().includes(q) || c.ucc.toLowerCase().includes(q)
+    );
+  }, [filteredBySegment, search]);
+
+  function personaliseMessage(customerName: string) {
+    const firstName = customerName.split(" ")[0];
+    if (editableMessage.startsWith("Hi ")) return editableMessage;
+    return editableMessage.replace(/^(📊|📈|🔥)/, `Hi ${firstName},\n\n$1`);
+  }
+
+  function whatsAppUrl(phone: string, customerName: string) {
+    return `https://wa.me/${phone}?text=${encodeURIComponent(personaliseMessage(customerName))}`;
+  }
+
+  return (
+    <div className="flex flex-col h-full min-h-0">
+      {/* Segment pills */}
+      <div className="shrink-0 border-b border-border px-4 py-3">
+        <div className="flex flex-wrap gap-1.5">
+          {BUSINESS_SEGMENTS.map((seg) => {
+            const count = customerRows.filter(seg.filter).length;
+            const isActive = activeSegment === seg.id;
+            return (
+              <button
+                key={seg.id}
+                type="button"
+                onClick={() => setActiveSegment(seg.id)}
+                className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-all ${
+                  isActive
+                    ? "border-[#542087] bg-[#542087] text-white"
+                    : "border-border text-muted-foreground hover:border-[#542087]/40 hover:text-foreground"
+                }`}
+              >
+                {seg.label}
+                <span
+                  className={`rounded-full px-1.5 py-px text-[10px] ${
+                    isActive ? "bg-white/20 text-white" : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        {activeSegment !== "all" && (
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            {BUSINESS_SEGMENTS.find((s) => s.id === activeSegment)?.description}
+          </p>
+        )}
+      </div>
+
+      {/* Search */}
+      <div className="shrink-0 border-b border-border px-4 py-2.5">
+        <div className="flex h-8 items-center gap-2 rounded-lg border border-border bg-muted/30 px-3">
+          <Search size={13} className="shrink-0 text-muted-foreground" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name or UCC…"
+            className="flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
+          />
+          {search && (
+            <button type="button" onClick={() => setSearch("")} className="text-muted-foreground hover:text-foreground">
+              <X size={11} />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Customer list */}
+      <div className="flex-1 overflow-y-auto divide-y divide-border/60">
+        {displayedCustomers.length === 0 ? (
+          <div className="p-8 text-center text-sm text-muted-foreground">No customers found.</div>
+        ) : (
+          displayedCustomers.map((customer) => {
+            const phone = CUSTOMER_PHONES[customer.ucc] ?? "919999999999";
+            const waUrl = whatsAppUrl(phone, customer.name);
+            const badge = customer.suggestedActions.find((a) =>
+              ["Top 5% client", "Likely to lapse", "High F&O Losses"].includes(a)
+            );
+            return (
+              <div key={customer.ucc} className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/30 transition-colors">
+                <Avatar name={customer.name} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="truncate text-[13px] font-medium text-foreground">{customer.name}</span>
+                    {badge && <SegmentBadge label={badge} />}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground">{customer.ucc}</div>
+                </div>
+                <a
+                  href={waUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  title={`Send to ${customer.name} via WhatsApp`}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#25D366]/30 bg-[#25D366]/8 text-[#25D366] hover:bg-[#25D366]/20 transition-colors"
+                >
+                  <MessageCircle size={15} />
+                </a>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Footer count */}
+      <div className="shrink-0 border-t border-border bg-muted/20 px-4 py-2.5">
+        <span className="text-[11px] text-muted-foreground">
+          {displayedCustomers.length} customer{displayedCustomers.length !== 1 ? "s" : ""} shown
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main Modal ─────────────────────────────────────────────────────────── */
 
 export function ServicingShareModal({
   title,
@@ -66,286 +288,165 @@ export function ServicingShareModal({
   message: string;
   onClose: () => void;
 }) {
-  const [tab, setTab] = useState<ShareModalTab>("segments");
-  const [activeSegment, setActiveSegment] = useState("all");
-  const [search, setSearch] = useState("");
   const [editableMessage, setEditableMessage] = useState(message);
-  const [isEditing, setIsEditing] = useState(false);
-  const [previewExpanded, setPreviewExpanded] = useState(true);
-
-  const filteredBySegment = useMemo(() => {
-    const seg = BUSINESS_SEGMENTS.find((s) => s.id === activeSegment);
-    return seg ? customerRows.filter(seg.filter) : customerRows;
-  }, [activeSegment]);
-
-  const displayedCustomers = useMemo(() => {
-    const base = tab === "segments" ? filteredBySegment : customerRows;
-    if (!search.trim()) return base;
-    const q = search.toLowerCase();
-    return base.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) || c.ucc.toLowerCase().includes(q),
-    );
-  }, [tab, filteredBySegment, search]);
-
-  function personaliseMessage(customerName: string) {
-    const firstName = customerName.split(" ")[0];
-    if (editableMessage.startsWith("Hi ")) return editableMessage;
-    return editableMessage.replace(/^(📊|📈)/, `Hi ${firstName},\n\n$1`);
-  }
-
-  function whatsAppUrl(phone: string, customerName: string) {
-    return `https://wa.me/${phone}?text=${encodeURIComponent(personaliseMessage(customerName))}`;
-  }
+  const [mobileStep, setMobileStep] = useState<MobileStep>("message");
+  // Close on Escape
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-      <div className="relative flex max-h-[90vh] w-full max-w-lg flex-col rounded-xl border border-border bg-card shadow-2xl">
-        <div className="flex shrink-0 items-start justify-between border-b border-border p-5">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-3 md:p-6"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      {/* ── Desktop: two-column landscape ─────────────────────────────── */}
+      <div
+        className="hidden md:flex flex-col w-full max-w-4xl rounded-2xl border border-border bg-card shadow-2xl overflow-hidden"
+        style={{ height: "min(82vh, 640px)" }}
+      >
+        {/* Single full-width header */}
+        <div className="flex shrink-0 items-center justify-between border-b border-border px-5 py-3.5 bg-card">
           <div>
-            <h3 className="text-base font-semibold text-foreground">{title}</h3>
-            <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
+            <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{subtitle}</p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md p-1 text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+            className="ml-4 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            aria-label="Close"
           >
-            <X size={16} />
+            <X size={15} />
           </button>
         </div>
 
-        <div className="shrink-0 border-b border-border">
-          <button
-            type="button"
-            onClick={() => setPreviewExpanded(!previewExpanded)}
-            className="flex w-full items-center justify-between px-4 py-2.5 hover:bg-muted/30"
-          >
-            <div className="flex items-center gap-2">
-              <MessageCircle size={14} className="text-[#25D366]" />
-              <span className="text-xs font-semibold text-foreground">
-                Message Preview
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              {!previewExpanded && (
-                <span className="text-[10px] text-muted-foreground">
-                  Click to expand
-                </span>
-              )}
-              {previewExpanded ? (
-                <ChevronUp size={14} className="text-muted-foreground" />
-              ) : (
-                <ChevronDown size={14} className="text-muted-foreground" />
-              )}
-            </div>
-          </button>
-          {previewExpanded && (
-            <div className="px-4 pb-3">
-              <div className="relative overflow-hidden rounded-lg border border-border bg-[#F8F9FA]">
-                <div className="p-3">
-                  {isEditing ? (
-                    <textarea
-                      value={editableMessage}
-                      onChange={(e) => setEditableMessage(e.target.value)}
-                      className="min-h-[120px] w-full resize-y rounded-md border border-border bg-white p-2.5 font-mono text-xs leading-relaxed text-[#262626] outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
-                      autoFocus
-                    />
-                  ) : (
-                    <div className="whitespace-pre-wrap rounded-lg border border-[#E8E8E8] bg-white p-2.5 text-xs leading-relaxed text-[#262626] shadow-sm">
-                      {editableMessage}
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center justify-between border-t border-border bg-[#F0F0F0] px-3 py-2">
-                  {isEditing ? (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditableMessage(message);
-                          setIsEditing(false);
-                        }}
-                        className="text-[11px] text-muted-foreground hover:text-foreground"
-                      >
-                        Reset to default
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setIsEditing(false)}
-                        className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1 text-[11px] font-medium text-primary-foreground hover:bg-primary/90"
-                      >
-                        Done
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-[10px] text-muted-foreground">
-                        This message will be sent via WhatsApp
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setIsEditing(true)}
-                        className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/5 px-2.5 py-1 text-[11px] font-medium text-primary hover:bg-primary/10"
-                      >
-                        <Pencil size={10} />
-                        Edit message
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="flex shrink-0 border-b border-border">
-          <button
-            type="button"
-            onClick={() => setTab("segments")}
-            className={`flex-1 py-2.5 text-xs font-medium transition-colors ${
-              tab === "segments"
-                ? "border-b-2 border-primary text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Business Opportunities
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("customers")}
-            className={`flex-1 py-2.5 text-xs font-medium transition-colors ${
-              tab === "customers"
-                ? "border-b-2 border-primary text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            All Customers
-          </button>
-        </div>
-
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          {tab === "segments" && (
-            <div className="shrink-0 border-b border-border p-3">
-              <div className="flex flex-wrap gap-2">
-                {BUSINESS_SEGMENTS.map((seg) => (
-                  <button
-                    key={seg.id}
-                    type="button"
-                    onClick={() => setActiveSegment(seg.id)}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                      activeSegment === seg.id
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
-                    }`}
-                  >
-                    {seg.label}
-                    <span
-                      className={`rounded-full px-1.5 py-px text-[10px] ${
-                        activeSegment === seg.id
-                          ? "bg-white/20 text-white"
-                          : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {customerRows.filter(seg.filter).length}
-                    </span>
-                  </button>
-                ))}
-              </div>
-              {activeSegment !== "all" && (
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {
-                    BUSINESS_SEGMENTS.find((s) => s.id === activeSegment)
-                      ?.description
-                  }
-                </p>
-              )}
-            </div>
-          )}
-
-          <div className="shrink-0 border-b border-border px-3 py-2">
-            <div className="flex h-8 items-center gap-2 rounded-md border border-border bg-muted/30 px-2.5">
-              <Search size={13} className="shrink-0 text-muted-foreground" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name or UCC…"
-                className="flex-1 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
+        {/* Two-column body */}
+        <div className="flex flex-1 min-h-0">
+          {/* Left: message panel */}
+          <div className="w-[42%] border-r border-border flex flex-col bg-white min-h-0">
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <MessagePanel
+                message={message}
+                editableMessage={editableMessage}
+                onChange={setEditableMessage}
+                onReset={() => setEditableMessage(message)}
               />
-              {search && (
+            </div>
+          </div>
+
+          {/* Right: customers panel */}
+          <div className="flex-1 flex flex-col min-h-0 bg-card">
+            <div className="px-5 py-3.5 border-b border-border shrink-0">
+              <p className="text-sm font-semibold text-foreground">Select Customers</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Choose who receives this on WhatsApp</p>
+            </div>
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <CustomersPanel editableMessage={editableMessage} message={message} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Mobile: two-step flow ──────────────────────────────────────── */}
+      <div className="flex md:hidden flex-col w-full rounded-2xl border border-border bg-card shadow-2xl overflow-hidden"
+        style={{ height: "88vh" }}>
+        {/* Step 1: Review message */}
+        {mobileStep === "message" && (
+          <>
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3.5 border-b border-border shrink-0">
+              <div>
+                <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Step 1 of 2 · Review your message</p>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            {/* Editable message */}
+            <div className="flex-1 flex flex-col px-4 py-4 gap-3 overflow-hidden min-h-0">
+              <div className="flex items-center gap-2">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#25D366]/10">
+                  <MessageCircle size={13} className="text-[#25D366]" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold text-foreground">WhatsApp Message</p>
+                  <p className="text-[10px] text-muted-foreground">Tap to edit directly</p>
+                </div>
+              </div>
+              <div className="flex-1 rounded-xl bg-[#ECF8F1] border border-[#25D366]/20 p-3 overflow-hidden flex flex-col min-h-0">
+                <textarea
+                  value={editableMessage}
+                  onChange={(e) => setEditableMessage(e.target.value)}
+                  className="flex-1 w-full resize-none bg-transparent text-[12.5px] leading-relaxed text-[#1a1a1a] outline-none font-[inherit] min-h-0"
+                  spellCheck={false}
+                />
+              </div>
+              <div className="flex items-center justify-between">
                 <button
                   type="button"
-                  onClick={() => setSearch("")}
-                  className="text-muted-foreground hover:text-foreground"
+                  onClick={() => setEditableMessage(message)}
+                  disabled={editableMessage === message}
+                  className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <X size={12} />
+                  <RotateCcw size={10} />
+                  Reset
                 </button>
-              )}
+                <span className="text-[10px] text-muted-foreground">{editableMessage.length} chars</span>
+              </div>
             </div>
-          </div>
 
-          <div className="flex-1 overflow-y-auto">
-            {displayedCustomers.length === 0 ? (
-              <div className="p-6 text-center text-sm text-muted-foreground">
-                No customers found.
-              </div>
-            ) : (
-              <div className="divide-y divide-border">
-                {displayedCustomers.map((customer) => {
-                  const phone = CUSTOMER_PHONES[customer.ucc] ?? "919999999999";
-                  const waUrl = whatsAppUrl(phone, customer.name);
-                  return (
-                    <div
-                      key={customer.ucc}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30"
-                    >
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-xs font-semibold text-primary">
-                        {customer.name
-                          .split(" ")
-                          .slice(0, 2)
-                          .map((p) => p[0])
-                          .join("")
-                          .toUpperCase()}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium text-foreground">
-                          {customer.name}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {customer.ucc}
-                        </div>
-                      </div>
-                      <a
-                        href={waUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        title={`Send to ${customer.name} on WhatsApp`}
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#25D366]/30 bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20"
-                      >
-                        <MessageCircle size={15} />
-                      </a>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
+            {/* CTA */}
+            <div className="shrink-0 px-4 py-4 border-t border-border bg-muted/10">
+              <button
+                type="button"
+                onClick={() => setMobileStep("customers")}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#542087] px-4 py-3 text-sm font-semibold text-white hover:bg-[#6b2ba8] active:bg-[#3d1866] transition-colors shadow-sm"
+              >
+                Select Customers
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </>
+        )}
 
-        <div className="flex shrink-0 items-center justify-between border-t border-border bg-muted/20 px-5 py-3">
-          <span className="text-xs text-muted-foreground">
-            {displayedCustomers.length} customer
-            {displayedCustomers.length !== 1 ? "s" : ""} shown
-          </span>
-          <button
-            type="button"
-            onClick={onClose}
-            className="h-8 rounded-md border border-border px-3 text-xs font-medium text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-          >
-            Close
-          </button>
-        </div>
+        {/* Step 2: Select customers */}
+        {mobileStep === "customers" && (
+          <>
+            {/* Header */}
+            <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border shrink-0">
+              <button
+                type="button"
+                onClick={() => setMobileStep("message")}
+                className="rounded-lg p-1.5 -ml-1 text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+              >
+                <ArrowLeft size={16} />
+              </button>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground">Select Customers</p>
+                <p className="text-[11px] text-muted-foreground">Step 2 of 2 · Send via WhatsApp</p>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+              >
+                <X size={15} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden min-h-0 flex flex-col">
+              <CustomersPanel editableMessage={editableMessage} message={message} />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

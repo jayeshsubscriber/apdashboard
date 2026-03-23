@@ -137,7 +137,7 @@ export function Header({
   }, [search]);
 
   return (
-    <header className="w-full" style={{ backgroundColor: "var(--color-brand)" }}>
+    <header className="w-full md:sticky md:top-0 md:z-50" style={{ backgroundColor: "var(--color-brand)" }}>
       {/* Main header row */}
       <div className="flex items-center px-4 md:px-6 h-14 gap-3 md:gap-6">
         {/* Logo */}
