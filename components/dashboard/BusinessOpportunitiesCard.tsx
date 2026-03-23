@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChevronRight, Eye, EyeOff, Layers, Lightbulb, MessageCircle, Phone } from "lucide-react";
+import { BOActionModal, type BOActionPayload, type BOActionType } from "./BOActionModal";
 
 const WhatsAppIcon = ({ size = 14 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
@@ -270,7 +271,7 @@ function LeadsTable({ pane }: { pane: Extract<DetailPane, { kind: "leads" }> }) 
         </thead>
         <tbody className="divide-y divide-border">
           {pane.rows.map((r) => (
-            <tr key={r.clientUcc} className="hover:bg-muted/20 transition-colors">
+            <tr key={r.clientUcc} className="hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => window.open(COMPLETE_APPLICATION_URL, "_blank")}>
               <td className="px-3 py-2.5 text-xs text-muted-foreground whitespace-nowrap">{r.dateCreated}</td>
               <td className="px-3 py-2.5 text-xs text-muted-foreground whitespace-nowrap">{r.lastUpdated}</td>
               <td className="px-3 py-2.5 font-medium text-foreground whitespace-nowrap">{r.name}</td>
@@ -281,7 +282,7 @@ function LeadsTable({ pane }: { pane: Extract<DetailPane, { kind: "leads" }> }) 
                   </span>
                   <button
                     type="button"
-                    onClick={() => setRevealedEmails((p) => ({ ...p, [r.clientUcc]: !p[r.clientUcc] }))}
+                    onClick={(e) => { e.stopPropagation(); setRevealedEmails((p) => ({ ...p, [r.clientUcc]: !p[r.clientUcc] })); }}
                     className="shrink-0 text-muted-foreground hover:text-foreground"
                     aria-label={revealedEmails[r.clientUcc] ? "Hide email" : "Show email"}
                   >
@@ -296,7 +297,7 @@ function LeadsTable({ pane }: { pane: Extract<DetailPane, { kind: "leads" }> }) 
                   </span>
                   <button
                     type="button"
-                    onClick={() => setRevealedPhones((p) => ({ ...p, [r.clientUcc]: !p[r.clientUcc] }))}
+                    onClick={(e) => { e.stopPropagation(); setRevealedPhones((p) => ({ ...p, [r.clientUcc]: !p[r.clientUcc] })); }}
                     className="shrink-0 text-muted-foreground hover:text-foreground"
                     aria-label={revealedPhones[r.clientUcc] ? "Hide mobile" : "Show mobile"}
                   >
@@ -311,6 +312,7 @@ function LeadsTable({ pane }: { pane: Extract<DetailPane, { kind: "leads" }> }) 
                     href={buildWhatsAppUrl(r.name, r.phoneNumber, r.currentStep)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
                     className="flex items-center justify-center w-6 h-6 rounded-full bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 transition-colors"
                     aria-label="Send WhatsApp nudge"
                     title="Send WhatsApp message"
@@ -321,6 +323,7 @@ function LeadsTable({ pane }: { pane: Extract<DetailPane, { kind: "leads" }> }) 
                     href={COMPLETE_APPLICATION_URL}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
                     className="inline-flex items-center gap-0.5 text-xs font-semibold text-primary hover:underline whitespace-nowrap"
                   >
                     View Application <ChevronRight size={11} />
@@ -335,7 +338,7 @@ function LeadsTable({ pane }: { pane: Extract<DetailPane, { kind: "leads" }> }) 
   );
 }
 
-function ReadyToTradeTable({ pane }: { pane: Extract<DetailPane, { kind: "readyToTrade" }> }) {
+function ReadyToTradeTable({ pane, onSelectCustomer, onAction }: { pane: Extract<DetailPane, { kind: "readyToTrade" }>; onSelectCustomer?: (ucc: string) => void; onAction?: (p: BOActionPayload) => void }) {
   const [revealedPhones, setRevealedPhones] = useState<Record<string, boolean>>({});
 
   return (
@@ -352,7 +355,7 @@ function ReadyToTradeTable({ pane }: { pane: Extract<DetailPane, { kind: "readyT
         </thead>
         <tbody className="divide-y divide-border">
           {pane.rows.map((r) => (
-            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors">
+            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => onSelectCustomer?.(r.ucc)}>
               <td className="px-3 py-2.5">
                 <div className="font-medium text-foreground">{r.name} <span className="font-mono font-normal text-muted-foreground">({r.ucc})</span></div>
               </td>
@@ -363,7 +366,7 @@ function ReadyToTradeTable({ pane }: { pane: Extract<DetailPane, { kind: "readyT
                   </span>
                   <button
                     type="button"
-                    onClick={() => setRevealedPhones((p) => ({ ...p, [r.ucc]: !p[r.ucc] }))}
+                    onClick={(e) => { e.stopPropagation(); setRevealedPhones((p) => ({ ...p, [r.ucc]: !p[r.ucc] })); }}
                     className="shrink-0 text-muted-foreground hover:text-foreground"
                     aria-label={revealedPhones[r.ucc] ? "Hide mobile" : "Show mobile"}
                   >
@@ -384,6 +387,7 @@ function ReadyToTradeTable({ pane }: { pane: Extract<DetailPane, { kind: "readyT
               <td className="px-3 py-2.5">
                 <button
                   type="button"
+                  onClick={(e) => { e.stopPropagation(); onAction?.({ type: "suggest", customerName: r.name, customerUcc: r.ucc, customerPhone: r.phoneNumber }); }}
                   className="inline-flex items-center gap-0.5 text-xs font-semibold text-primary hover:underline whitespace-nowrap"
                 >
                   Suggest Products <ChevronRight size={11} />
@@ -397,7 +401,7 @@ function ReadyToTradeTable({ pane }: { pane: Extract<DetailPane, { kind: "readyT
   );
 }
 
-function RecentlyActivatedTable({ pane }: { pane: Extract<DetailPane, { kind: "recentlyActivated" }> }) {
+function RecentlyActivatedTable({ pane, onSelectCustomer, onAction }: { pane: Extract<DetailPane, { kind: "recentlyActivated" }>; onSelectCustomer?: (ucc: string) => void; onAction?: (p: BOActionPayload) => void }) {
   const [revealedPhones, setRevealedPhones] = useState<Record<string, boolean>>({});
 
   return (
@@ -415,7 +419,7 @@ function RecentlyActivatedTable({ pane }: { pane: Extract<DetailPane, { kind: "r
         </thead>
         <tbody className="divide-y divide-border">
           {pane.rows.map((r) => (
-            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors">
+            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => onSelectCustomer?.(r.ucc)}>
               <td className="px-3 py-2.5">
                 <div className="font-medium text-foreground">{r.name} <span className="font-mono font-normal text-muted-foreground">({r.ucc})</span></div>
               </td>
@@ -426,7 +430,7 @@ function RecentlyActivatedTable({ pane }: { pane: Extract<DetailPane, { kind: "r
                   </span>
                   <button
                     type="button"
-                    onClick={() => setRevealedPhones((p) => ({ ...p, [r.ucc]: !p[r.ucc] }))}
+                    onClick={(e) => { e.stopPropagation(); setRevealedPhones((p) => ({ ...p, [r.ucc]: !p[r.ucc] })); }}
                     className="shrink-0 text-muted-foreground hover:text-foreground"
                     aria-label={revealedPhones[r.ucc] ? "Hide mobile" : "Show mobile"}
                   >
@@ -444,6 +448,7 @@ function RecentlyActivatedTable({ pane }: { pane: Extract<DetailPane, { kind: "r
               <td className="px-3 py-2.5">
                 <button
                   type="button"
+                  onClick={(e) => { e.stopPropagation(); onAction?.({ type: "suggest", customerName: r.name, customerUcc: r.ucc, customerPhone: r.phoneNumber }); }}
                   className="inline-flex items-center gap-0.5 text-xs font-semibold text-primary hover:underline whitespace-nowrap"
                 >
                   Suggest Products <ChevronRight size={11} />
@@ -457,7 +462,7 @@ function RecentlyActivatedTable({ pane }: { pane: Extract<DetailPane, { kind: "r
   );
 }
 
-function LikelyToLapseTable({ pane }: { pane: Extract<DetailPane, { kind: "likelyToLapse" }> }) {
+function LikelyToLapseTable({ pane, onSelectCustomer, onAction }: { pane: Extract<DetailPane, { kind: "likelyToLapse" }>; onSelectCustomer?: (ucc: string) => void; onAction?: (p: BOActionPayload) => void }) {
   const [revealedPhones, setRevealedPhones] = useState<Record<string, boolean>>({});
   return (
     <div className="overflow-x-auto">
@@ -474,14 +479,14 @@ function LikelyToLapseTable({ pane }: { pane: Extract<DetailPane, { kind: "likel
         </thead>
         <tbody className="divide-y divide-border">
           {pane.rows.map((r) => (
-            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors">
+            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => onSelectCustomer?.(r.ucc)}>
               <td className="px-3 py-2.5 font-medium text-foreground whitespace-nowrap">
                 {r.name} <span className="font-mono font-normal text-muted-foreground">({r.ucc})</span>
               </td>
               <td className="px-3 py-2.5">
                 <div className="flex items-center gap-1.5">
                   <span className="font-mono text-xs text-muted-foreground">{revealedPhones[r.ucc] ? r.phoneNumber : maskPhone(r.phoneNumber)}</span>
-                  <button type="button" onClick={() => setRevealedPhones((p) => ({ ...p, [r.ucc]: !p[r.ucc] }))} className="shrink-0 text-muted-foreground hover:text-foreground" aria-label={revealedPhones[r.ucc] ? "Hide mobile" : "Show mobile"}>
+                  <button type="button" onClick={(e) => { e.stopPropagation(); setRevealedPhones((p) => ({ ...p, [r.ucc]: !p[r.ucc] })); }} className="shrink-0 text-muted-foreground hover:text-foreground" aria-label={revealedPhones[r.ucc] ? "Hide mobile" : "Show mobile"}>
                     {revealedPhones[r.ucc] ? <EyeOff size={12} /> : <Eye size={12} />}
                   </button>
                 </div>
@@ -494,7 +499,7 @@ function LikelyToLapseTable({ pane }: { pane: Extract<DetailPane, { kind: "likel
               </td>
               <td className="px-3 py-2.5 text-xs text-muted-foreground">{r.productsTraded}</td>
               <td className="px-3 py-2.5">
-                <button type="button" className="inline-flex items-center gap-0.5 text-xs font-semibold text-primary hover:underline whitespace-nowrap">
+                <button type="button" onClick={(e) => { e.stopPropagation(); onAction?.({ type: "reengage", customerName: r.name, customerUcc: r.ucc, customerPhone: r.phoneNumber }); }} className="inline-flex items-center gap-0.5 text-xs font-semibold text-primary hover:underline whitespace-nowrap">
                   Re-engage <ChevronRight size={11} />
                 </button>
               </td>
@@ -506,7 +511,7 @@ function LikelyToLapseTable({ pane }: { pane: Extract<DetailPane, { kind: "likel
   );
 }
 
-function HighFnOTable({ pane }: { pane: Extract<DetailPane, { kind: "highFnO" }> }) {
+function HighFnOTable({ pane, onSelectCustomer, onAction }: { pane: Extract<DetailPane, { kind: "highFnO" }>; onSelectCustomer?: (ucc: string) => void; onAction?: (p: BOActionPayload) => void }) {
   const [revealedPhones, setRevealedPhones] = useState<Record<string, boolean>>({});
   return (
     <div className="overflow-x-auto">
@@ -522,14 +527,14 @@ function HighFnOTable({ pane }: { pane: Extract<DetailPane, { kind: "highFnO" }>
         </thead>
         <tbody className="divide-y divide-border">
           {pane.rows.map((r) => (
-            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors">
+            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => onSelectCustomer?.(r.ucc)}>
               <td className="px-3 py-2.5 font-medium text-foreground whitespace-nowrap">
                 {r.name} <span className="font-mono font-normal text-muted-foreground">({r.ucc})</span>
               </td>
               <td className="px-3 py-2.5">
                 <div className="flex items-center gap-1.5">
                   <span className="font-mono text-xs text-muted-foreground">{revealedPhones[r.ucc] ? r.phoneNumber : maskPhone(r.phoneNumber)}</span>
-                  <button type="button" onClick={() => setRevealedPhones((p) => ({ ...p, [r.ucc]: !p[r.ucc] }))} className="shrink-0 text-muted-foreground hover:text-foreground" aria-label={revealedPhones[r.ucc] ? "Hide mobile" : "Show mobile"}>
+                  <button type="button" onClick={(e) => { e.stopPropagation(); setRevealedPhones((p) => ({ ...p, [r.ucc]: !p[r.ucc] })); }} className="shrink-0 text-muted-foreground hover:text-foreground" aria-label={revealedPhones[r.ucc] ? "Hide mobile" : "Show mobile"}>
                     {revealedPhones[r.ucc] ? <EyeOff size={12} /> : <Eye size={12} />}
                   </button>
                 </div>
@@ -537,7 +542,7 @@ function HighFnOTable({ pane }: { pane: Extract<DetailPane, { kind: "highFnO" }>
               <td className="px-3 py-2.5 text-xs font-semibold text-red-600 whitespace-nowrap">{r.netLoss}</td>
               <td className="px-3 py-2.5 text-xs text-muted-foreground whitespace-nowrap">{r.lossPeriod}</td>
               <td className="px-3 py-2.5">
-                <button type="button" className="inline-flex items-center gap-0.5 text-xs font-semibold text-primary hover:underline whitespace-nowrap">
+                <button type="button" onClick={(e) => { e.stopPropagation(); onAction?.({ type: "schedule", customerName: r.name, customerUcc: r.ucc, customerPhone: r.phoneNumber }); }} className="inline-flex items-center gap-0.5 text-xs font-semibold text-primary hover:underline whitespace-nowrap">
                   Schedule Call <ChevronRight size={11} />
                 </button>
               </td>
@@ -549,7 +554,7 @@ function HighFnOTable({ pane }: { pane: Extract<DetailPane, { kind: "highFnO" }>
   );
 }
 
-function TopFiveTable({ pane }: { pane: Extract<DetailPane, { kind: "topFive" }> }) {
+function TopFiveTable({ pane, onSelectCustomer, onAction }: { pane: Extract<DetailPane, { kind: "topFive" }>; onSelectCustomer?: (ucc: string) => void; onAction?: (p: BOActionPayload) => void }) {
   const [revealedPhones, setRevealedPhones] = useState<Record<string, boolean>>({});
   return (
     <div className="overflow-x-auto">
@@ -565,14 +570,14 @@ function TopFiveTable({ pane }: { pane: Extract<DetailPane, { kind: "topFive" }>
         </thead>
         <tbody className="divide-y divide-border">
           {pane.rows.map((r) => (
-            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors">
+            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => onSelectCustomer?.(r.ucc)}>
               <td className="px-3 py-2.5 font-medium text-foreground whitespace-nowrap">
                 {r.name} <span className="font-mono font-normal text-muted-foreground">({r.ucc})</span>
               </td>
               <td className="px-3 py-2.5">
                 <div className="flex items-center gap-1.5">
                   <span className="font-mono text-xs text-muted-foreground">{revealedPhones[r.ucc] ? r.phoneNumber : maskPhone(r.phoneNumber)}</span>
-                  <button type="button" onClick={() => setRevealedPhones((p) => ({ ...p, [r.ucc]: !p[r.ucc] }))} className="shrink-0 text-muted-foreground hover:text-foreground" aria-label={revealedPhones[r.ucc] ? "Hide mobile" : "Show mobile"}>
+                  <button type="button" onClick={(e) => { e.stopPropagation(); setRevealedPhones((p) => ({ ...p, [r.ucc]: !p[r.ucc] })); }} className="shrink-0 text-muted-foreground hover:text-foreground" aria-label={revealedPhones[r.ucc] ? "Hide mobile" : "Show mobile"}>
                     {revealedPhones[r.ucc] ? <EyeOff size={12} /> : <Eye size={12} />}
                   </button>
                 </div>
@@ -580,7 +585,7 @@ function TopFiveTable({ pane }: { pane: Extract<DetailPane, { kind: "topFive" }>
               <td className="px-3 py-2.5 text-xs font-semibold text-foreground whitespace-nowrap">{r.prevMonthRevenue}</td>
               <td className="px-3 py-2.5 text-xs text-muted-foreground">{r.productsHeld}</td>
               <td className="px-3 py-2.5">
-                <button type="button" className="inline-flex items-center gap-0.5 text-xs font-semibold text-primary hover:underline whitespace-nowrap">
+                <button type="button" onClick={(e) => { e.stopPropagation(); onAction?.({ type: "checkin", customerName: r.name, customerUcc: r.ucc, customerPhone: r.phoneNumber }); }} className="inline-flex items-center gap-0.5 text-xs font-semibold text-primary hover:underline whitespace-nowrap">
                   Schedule Check-in <ChevronRight size={11} />
                 </button>
               </td>
@@ -607,15 +612,15 @@ function UpsellMobileCell({ ucc, phoneNumber, revealed, onToggle }: { ucc: strin
   );
 }
 
-function UpsellCTA() {
+function UpsellCTA({ onClick }: { onClick?: (e: React.MouseEvent) => void }) {
   return (
-    <button type="button" className="inline-flex items-center gap-0.5 text-xs font-semibold text-primary hover:underline whitespace-nowrap">
+    <button type="button" onClick={onClick} className="inline-flex items-center gap-0.5 text-xs font-semibold text-primary hover:underline whitespace-nowrap">
       Suggest Product <ChevronRight size={11} />
     </button>
   );
 }
 
-function EquityUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "equityUpsell" }> }) {
+function EquityUpsellTable({ pane, onSelectCustomer, onAction }: { pane: Extract<DetailPane, { kind: "equityUpsell" }>; onSelectCustomer?: (ucc: string) => void; onAction?: (p: BOActionPayload) => void }) {
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   return (
     <div className="overflow-x-auto">
@@ -629,12 +634,12 @@ function EquityUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "equity
         </tr></thead>
         <tbody className="divide-y divide-border">
           {pane.rows.map((r) => (
-            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors">
+            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => onSelectCustomer?.(r.ucc)}>
               <td className="px-3 py-2.5"><UpsellNameCell name={r.name} ucc={r.ucc} /></td>
               <td className="px-3 py-2.5"><UpsellMobileCell ucc={r.ucc} phoneNumber={r.phoneNumber} revealed={!!revealed[r.ucc]} onToggle={() => setRevealed(p => ({ ...p, [r.ucc]: !p[r.ucc] }))} /></td>
               <td className="px-3 py-2.5 text-xs font-semibold text-foreground whitespace-nowrap">{r.portfolioValue}</td>
               <td className="px-3 py-2.5 text-xs text-muted-foreground whitespace-nowrap">{r.lastTraded}</td>
-              <td className="px-3 py-2.5"><UpsellCTA /></td>
+              <td className="px-3 py-2.5"><UpsellCTA onClick={(e) => { e.stopPropagation(); onAction?.({ type: "suggest", customerName: r.name, customerUcc: r.ucc, customerPhone: r.phoneNumber }); }} /></td>
             </tr>
           ))}
         </tbody>
@@ -643,7 +648,7 @@ function EquityUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "equity
   );
 }
 
-function FnOUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "fnoUpsell" }> }) {
+function FnOUpsellTable({ pane, onSelectCustomer, onAction }: { pane: Extract<DetailPane, { kind: "fnoUpsell" }>; onSelectCustomer?: (ucc: string) => void; onAction?: (p: BOActionPayload) => void }) {
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   return (
     <div className="overflow-x-auto">
@@ -657,12 +662,12 @@ function FnOUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "fnoUpsell
         </tr></thead>
         <tbody className="divide-y divide-border">
           {pane.rows.map((r) => (
-            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors">
+            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => onSelectCustomer?.(r.ucc)}>
               <td className="px-3 py-2.5"><UpsellNameCell name={r.name} ucc={r.ucc} /></td>
               <td className="px-3 py-2.5"><UpsellMobileCell ucc={r.ucc} phoneNumber={r.phoneNumber} revealed={!!revealed[r.ucc]} onToggle={() => setRevealed(p => ({ ...p, [r.ucc]: !p[r.ucc] }))} /></td>
               <td className="px-3 py-2.5 text-xs font-semibold text-foreground whitespace-nowrap">{r.monthlyTurnover}</td>
               <td className="px-3 py-2.5 text-xs text-muted-foreground">{r.contractsTraded}</td>
-              <td className="px-3 py-2.5"><UpsellCTA /></td>
+              <td className="px-3 py-2.5"><UpsellCTA onClick={(e) => { e.stopPropagation(); onAction?.({ type: "suggest", customerName: r.name, customerUcc: r.ucc, customerPhone: r.phoneNumber }); }} /></td>
             </tr>
           ))}
         </tbody>
@@ -671,7 +676,7 @@ function FnOUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "fnoUpsell
   );
 }
 
-function IntradayUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "intradayUpsell" }> }) {
+function IntradayUpsellTable({ pane, onSelectCustomer, onAction }: { pane: Extract<DetailPane, { kind: "intradayUpsell" }>; onSelectCustomer?: (ucc: string) => void; onAction?: (p: BOActionPayload) => void }) {
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   return (
     <div className="overflow-x-auto">
@@ -685,12 +690,12 @@ function IntradayUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "intr
         </tr></thead>
         <tbody className="divide-y divide-border">
           {pane.rows.map((r) => (
-            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors">
+            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => onSelectCustomer?.(r.ucc)}>
               <td className="px-3 py-2.5"><UpsellNameCell name={r.name} ucc={r.ucc} /></td>
               <td className="px-3 py-2.5"><UpsellMobileCell ucc={r.ucc} phoneNumber={r.phoneNumber} revealed={!!revealed[r.ucc]} onToggle={() => setRevealed(p => ({ ...p, [r.ucc]: !p[r.ucc] }))} /></td>
               <td className="px-3 py-2.5 text-xs text-muted-foreground">{r.avgDailyTrades} trades</td>
               <td className="px-3 py-2.5 text-xs font-semibold text-foreground whitespace-nowrap">{r.monthlyVolume}</td>
-              <td className="px-3 py-2.5"><UpsellCTA /></td>
+              <td className="px-3 py-2.5"><UpsellCTA onClick={(e) => { e.stopPropagation(); onAction?.({ type: "suggest", customerName: r.name, customerUcc: r.ucc, customerPhone: r.phoneNumber }); }} /></td>
             </tr>
           ))}
         </tbody>
@@ -699,7 +704,7 @@ function IntradayUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "intr
   );
 }
 
-function IpoUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "ipoUpsell" }> }) {
+function IpoUpsellTable({ pane, onSelectCustomer, onAction }: { pane: Extract<DetailPane, { kind: "ipoUpsell" }>; onSelectCustomer?: (ucc: string) => void; onAction?: (p: BOActionPayload) => void }) {
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   return (
     <div className="overflow-x-auto">
@@ -713,12 +718,12 @@ function IpoUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "ipoUpsell
         </tr></thead>
         <tbody className="divide-y divide-border">
           {pane.rows.map((r) => (
-            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors">
+            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => onSelectCustomer?.(r.ucc)}>
               <td className="px-3 py-2.5"><UpsellNameCell name={r.name} ucc={r.ucc} /></td>
               <td className="px-3 py-2.5"><UpsellMobileCell ucc={r.ucc} phoneNumber={r.phoneNumber} revealed={!!revealed[r.ucc]} onToggle={() => setRevealed(p => ({ ...p, [r.ucc]: !p[r.ucc] }))} /></td>
               <td className="px-3 py-2.5 text-xs text-muted-foreground">{r.lastIpoApplied}</td>
               <td className="px-3 py-2.5 text-xs font-semibold text-foreground whitespace-nowrap">{r.applicationAmount}</td>
-              <td className="px-3 py-2.5"><UpsellCTA /></td>
+              <td className="px-3 py-2.5"><UpsellCTA onClick={(e) => { e.stopPropagation(); onAction?.({ type: "suggest", customerName: r.name, customerUcc: r.ucc, customerPhone: r.phoneNumber }); }} /></td>
             </tr>
           ))}
         </tbody>
@@ -727,7 +732,7 @@ function IpoUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "ipoUpsell
   );
 }
 
-function MfUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "mfUpsell" }> }) {
+function MfUpsellTable({ pane, onSelectCustomer, onAction }: { pane: Extract<DetailPane, { kind: "mfUpsell" }>; onSelectCustomer?: (ucc: string) => void; onAction?: (p: BOActionPayload) => void }) {
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   return (
     <div className="overflow-x-auto">
@@ -741,12 +746,12 @@ function MfUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "mfUpsell" 
         </tr></thead>
         <tbody className="divide-y divide-border">
           {pane.rows.map((r) => (
-            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors">
+            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => onSelectCustomer?.(r.ucc)}>
               <td className="px-3 py-2.5"><UpsellNameCell name={r.name} ucc={r.ucc} /></td>
               <td className="px-3 py-2.5"><UpsellMobileCell ucc={r.ucc} phoneNumber={r.phoneNumber} revealed={!!revealed[r.ucc]} onToggle={() => setRevealed(p => ({ ...p, [r.ucc]: !p[r.ucc] }))} /></td>
               <td className="px-3 py-2.5 text-xs font-semibold text-foreground whitespace-nowrap">{r.monthlySip}</td>
               <td className="px-3 py-2.5 text-xs font-semibold text-foreground whitespace-nowrap">{r.totalInvestment}</td>
-              <td className="px-3 py-2.5"><UpsellCTA /></td>
+              <td className="px-3 py-2.5"><UpsellCTA onClick={(e) => { e.stopPropagation(); onAction?.({ type: "suggest", customerName: r.name, customerUcc: r.ucc, customerPhone: r.phoneNumber }); }} /></td>
             </tr>
           ))}
         </tbody>
@@ -755,7 +760,7 @@ function MfUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "mfUpsell" 
   );
 }
 
-function MtfUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "mtfUpsell" }> }) {
+function MtfUpsellTable({ pane, onSelectCustomer, onAction }: { pane: Extract<DetailPane, { kind: "mtfUpsell" }>; onSelectCustomer?: (ucc: string) => void; onAction?: (p: BOActionPayload) => void }) {
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   return (
     <div className="overflow-x-auto">
@@ -769,12 +774,12 @@ function MtfUpsellTable({ pane }: { pane: Extract<DetailPane, { kind: "mtfUpsell
         </tr></thead>
         <tbody className="divide-y divide-border">
           {pane.rows.map((r) => (
-            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors">
+            <tr key={r.ucc} className="hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => onSelectCustomer?.(r.ucc)}>
               <td className="px-3 py-2.5"><UpsellNameCell name={r.name} ucc={r.ucc} /></td>
               <td className="px-3 py-2.5"><UpsellMobileCell ucc={r.ucc} phoneNumber={r.phoneNumber} revealed={!!revealed[r.ucc]} onToggle={() => setRevealed(p => ({ ...p, [r.ucc]: !p[r.ucc] }))} /></td>
               <td className="px-3 py-2.5 text-xs font-semibold text-foreground whitespace-nowrap">{r.mtfUtilized}</td>
               <td className="px-3 py-2.5 text-xs text-muted-foreground whitespace-nowrap">{r.creditLimit}</td>
-              <td className="px-3 py-2.5"><UpsellCTA /></td>
+              <td className="px-3 py-2.5"><UpsellCTA onClick={(e) => { e.stopPropagation(); onAction?.({ type: "suggest", customerName: r.name, customerUcc: r.ucc, customerPhone: r.phoneNumber }); }} /></td>
             </tr>
           ))}
         </tbody>
@@ -817,7 +822,7 @@ function SimpleTable({ pane }: { pane: Extract<DetailPane, { kind: "simple" }> }
   );
 }
 
-function DetailPanel({ pillId }: { pillId: PillId }) {
+function DetailPanel({ pillId, onSelectCustomer, onAction }: { pillId: PillId; onSelectCustomer?: (ucc: string) => void; onAction?: (p: BOActionPayload) => void }) {
   const pane = DETAIL_MAP[pillId];
   const pill = SECTIONS.flatMap((s) => s.pills).find((p) => p.id === pillId);
   return (
@@ -842,17 +847,17 @@ function DetailPanel({ pillId }: { pillId: PillId }) {
       </div>
 
       {pane.kind === "leads"             && <LeadsTable             pane={pane} />}
-      {pane.kind === "readyToTrade"      && <ReadyToTradeTable      pane={pane} />}
-      {pane.kind === "recentlyActivated" && <RecentlyActivatedTable pane={pane} />}
-      {pane.kind === "likelyToLapse"     && <LikelyToLapseTable     pane={pane} />}
-      {pane.kind === "highFnO"           && <HighFnOTable           pane={pane} />}
-      {pane.kind === "topFive"           && <TopFiveTable           pane={pane} />}
-      {pane.kind === "equityUpsell"      && <EquityUpsellTable      pane={pane} />}
-      {pane.kind === "fnoUpsell"         && <FnOUpsellTable         pane={pane} />}
-      {pane.kind === "intradayUpsell"    && <IntradayUpsellTable    pane={pane} />}
-      {pane.kind === "ipoUpsell"         && <IpoUpsellTable         pane={pane} />}
-      {pane.kind === "mfUpsell"          && <MfUpsellTable          pane={pane} />}
-      {pane.kind === "mtfUpsell"         && <MtfUpsellTable         pane={pane} />}
+      {pane.kind === "readyToTrade"      && <ReadyToTradeTable      pane={pane} onSelectCustomer={onSelectCustomer} onAction={onAction} />}
+      {pane.kind === "recentlyActivated" && <RecentlyActivatedTable pane={pane} onSelectCustomer={onSelectCustomer} onAction={onAction} />}
+      {pane.kind === "likelyToLapse"     && <LikelyToLapseTable     pane={pane} onSelectCustomer={onSelectCustomer} onAction={onAction} />}
+      {pane.kind === "highFnO"           && <HighFnOTable           pane={pane} onSelectCustomer={onSelectCustomer} onAction={onAction} />}
+      {pane.kind === "topFive"           && <TopFiveTable           pane={pane} onSelectCustomer={onSelectCustomer} onAction={onAction} />}
+      {pane.kind === "equityUpsell"      && <EquityUpsellTable      pane={pane} onSelectCustomer={onSelectCustomer} onAction={onAction} />}
+      {pane.kind === "fnoUpsell"         && <FnOUpsellTable         pane={pane} onSelectCustomer={onSelectCustomer} onAction={onAction} />}
+      {pane.kind === "intradayUpsell"    && <IntradayUpsellTable    pane={pane} onSelectCustomer={onSelectCustomer} onAction={onAction} />}
+      {pane.kind === "ipoUpsell"         && <IpoUpsellTable         pane={pane} onSelectCustomer={onSelectCustomer} onAction={onAction} />}
+      {pane.kind === "mfUpsell"          && <MfUpsellTable          pane={pane} onSelectCustomer={onSelectCustomer} onAction={onAction} />}
+      {pane.kind === "mtfUpsell"         && <MtfUpsellTable         pane={pane} onSelectCustomer={onSelectCustomer} onAction={onAction} />}
       {pane.kind === "simple"            && <SimpleTable            pane={pane} />}
     </div>
   );
@@ -860,17 +865,14 @@ function DetailPanel({ pillId }: { pillId: PillId }) {
 
 // ─── Section block (pills + inline table) ────────────────────────────────────
 
-function SectionBlock({ section, defaultPill }: { section: Section; defaultPill: PillId }) {
+function SectionBlock({ section, defaultPill, onSelectCustomer, onAction }: { section: Section; defaultPill: PillId; onSelectCustomer?: (ucc: string) => void; onAction?: (p: BOActionPayload) => void }) {
   const [activePillId, setActivePillId] = useState<PillId>(defaultPill);
 
   return (
     <div>
-      {/* Section label */}
       <p className="mb-3 text-xs font-bold uppercase tracking-widest text-foreground/60 border-l-2 border-primary/40 pl-2">
         {section.title}
       </p>
-
-      {/* Pills */}
       <div className="flex flex-wrap gap-2">
         {section.pills.map((pill) => {
           const isActive = pill.id === activePillId;
@@ -887,9 +889,7 @@ function SectionBlock({ section, defaultPill }: { section: Section; defaultPill:
             >
               {pill.label}
               <span className={`inline-flex items-center justify-center rounded px-1.5 py-0.5 text-[10px] font-bold leading-none ${
-                isActive
-                  ? "bg-white/25 text-white"
-                  : "bg-primary/10 text-primary"
+                isActive ? "bg-white/25 text-white" : "bg-primary/10 text-primary"
               }`}>
                 {pill.count}
               </span>
@@ -897,32 +897,36 @@ function SectionBlock({ section, defaultPill }: { section: Section; defaultPill:
           );
         })}
       </div>
-
-      {/* Inline detail table for the active pill */}
-      <DetailPanel pillId={activePillId} />
+      <DetailPanel pillId={activePillId} onSelectCustomer={onSelectCustomer} onAction={onAction} />
     </div>
   );
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function BusinessOpportunitiesCard() {
+export function BusinessOpportunitiesCard({ onSelectCustomer }: { onSelectCustomer?: (ucc: string) => void } = {}) {
+  const [activeModal, setActiveModal] = useState<BOActionPayload | null>(null);
+
   return (
     <section className="min-w-0 overflow-hidden">
       <div className="px-3 sm:px-5 py-4 sm:py-5">
-        {/* Title */}
         <h2 className="flex items-center gap-2 border-l-[3px] border-primary pl-3 text-lg font-semibold text-foreground tracking-tight">
           <Layers size={18} className="text-primary shrink-0" />
           Business Opportunities
         </h2>
-
-        {/* Each section manages its own pill selection + table */}
         <div className="mt-4 space-y-6">
-          <SectionBlock section={SECTIONS[0]} defaultPill="leads"         />
-          <SectionBlock section={SECTIONS[1]} defaultPill="likelyToLapse" />
-          <SectionBlock section={SECTIONS[2]} defaultPill="equity"        />
+          <SectionBlock section={SECTIONS[0]} defaultPill="leads"         onSelectCustomer={onSelectCustomer} onAction={setActiveModal} />
+          <SectionBlock section={SECTIONS[1]} defaultPill="likelyToLapse" onSelectCustomer={onSelectCustomer} onAction={setActiveModal} />
+          <SectionBlock section={SECTIONS[2]} defaultPill="equity"        onSelectCustomer={onSelectCustomer} onAction={setActiveModal} />
         </div>
       </div>
+
+      {activeModal && (
+        <BOActionModal
+          {...activeModal}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
     </section>
   );
 }

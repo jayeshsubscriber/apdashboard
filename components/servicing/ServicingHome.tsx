@@ -6,14 +6,6 @@ import { TrendingSection } from "./TrendingSection";
 import { MutualFundsSection } from "./MutualFundsSection";
 import { AdvisorySection } from "./AdvisorySection";
 
-function ComingSoonPane({ label }: { label: string }) {
-  return (
-    <div className="flex items-center justify-center py-24 text-muted-foreground">
-      <p className="text-sm font-medium">{label} — coming soon</p>
-    </div>
-  );
-}
-
 const SERVICING_SECTION_IDS: Record<ProductCategory, string> = {
   stocks: "servicing-stocks",
   "mutual-funds": "servicing-mutual-funds",
@@ -48,15 +40,6 @@ export function ServicingHome() {
         </section>
         <section id={SERVICING_SECTION_IDS.ipos} className={SECTION_SCROLL_CLASS}>
           <WealthProductsCard />
-        </section>
-        <section id={SERVICING_SECTION_IDS["fixed-deposits"]} className={SECTION_SCROLL_CLASS}>
-          <ComingSoonPane label="Fixed Deposits" />
-        </section>
-        <section id={SERVICING_SECTION_IDS.bonds} className={SECTION_SCROLL_CLASS}>
-          <ComingSoonPane label="Bonds" />
-        </section>
-        <section id={SERVICING_SECTION_IDS.insurance} className={SECTION_SCROLL_CLASS}>
-          <ComingSoonPane label="Insurance" />
         </section>
       </div>
     </main>

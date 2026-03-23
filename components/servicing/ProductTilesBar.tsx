@@ -148,7 +148,7 @@ export function ProductTilesBar({
         <p className="text-sm text-muted-foreground mt-0.5">Help your customers invest while you earn commissions across products</p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-1.5">
+      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-1.5">
         {PRODUCT_CATEGORIES.map(({ id, label, badge }) => {
           const Illustration = ILLUSTRATIONS[id];
           return (

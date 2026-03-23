@@ -10,9 +10,10 @@ import { ProductTilesBar } from "@/components/servicing/ProductTilesBar";
 
 interface DashboardHomeProps {
   onNavigateToServicing?: () => void;
+  onSelectCustomer?: (ucc: string) => void;
 }
 
-export function DashboardHome({ onNavigateToServicing }: DashboardHomeProps) {
+export function DashboardHome({ onNavigateToServicing, onSelectCustomer }: DashboardHomeProps) {
   return (
     <main className="flex-1 py-3">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
@@ -21,7 +22,7 @@ export function DashboardHome({ onNavigateToServicing }: DashboardHomeProps) {
           <PayoutSummaryCard />
           <EarningPotentialCard />
           <ProductTilesBar variant="dashboard" onTileClick={onNavigateToServicing} />
-          <BusinessOpportunitiesCard />
+          <BusinessOpportunitiesCard onSelectCustomer={onSelectCustomer} />
           {/* Mobile: Smart Suggestions + banner at bottom */}
           <div className="lg:hidden px-4 flex flex-col gap-3">
             <SmartSuggestionsCard />

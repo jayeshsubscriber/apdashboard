@@ -10,7 +10,9 @@ import {
   Users,
 } from "lucide-react";
 import { customerInsights, customerRows } from "../data";
+import { getCustomerDetail } from "../customer-detail-data";
 import { useMemo, useState } from "react";
+import { BOActionModal, type BOActionPayload } from "@/components/dashboard/BOActionModal";
 
 type Props = { onSelectCustomer: (ucc: string) => void };
 type CustomerInsightId = (typeof customerInsights)[number]["id"];
@@ -61,6 +63,7 @@ export function CustomersPanel({ onSelectCustomer }: Props) {
   }, [filteredCustomers, page]);
 
   const canPaginate = filteredCustomers.length > pageSize;
+  const [activeModal, setActiveModal] = useState<BOActionPayload | null>(null);
 
   return (
     <section className="p-3">
@@ -159,8 +162,8 @@ export function CustomersPanel({ onSelectCustomer }: Props) {
 
         <div className="min-w-0">
           <div className="overflow-x-auto rounded-md border border-border">
-            <div className="min-w-[1410px]">
-            <div className="grid grid-cols-[140px_160px_150px_120px_170px_190px_220px_260px] border-b border-border bg-muted/20 px-3 py-2 text-xs font-semibold text-muted-foreground">
+            <div className="min-w-[1560px]">
+            <div className="grid grid-cols-[140px_160px_150px_120px_170px_190px_220px_220px_190px] border-b border-border bg-muted/20 px-3 py-2 text-xs font-semibold text-muted-foreground">
               <div className="sticky left-0 bg-slate-50 z-10">UCC</div>
               <div>Client Name</div>
               <div>Equity AUM</div>
@@ -176,6 +179,7 @@ export function CustomersPanel({ onSelectCustomer }: Props) {
                 <br />
                 (Last 30 days)
               </div>
+              <div>Tags</div>
               <div>Suggested actions</div>
             </div>
             {visibleCustomers.map((r) => (
@@ -185,7 +189,7 @@ export function CustomersPanel({ onSelectCustomer }: Props) {
                 tabIndex={0}
                 onClick={() => onSelectCustomer(r.ucc)}
                 onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onSelectCustomer(r.ucc)}
-                className="group grid grid-cols-[140px_160px_150px_120px_170px_190px_220px_260px] items-start border-b border-border px-3 py-2 text-[13px] last:border-b-0 cursor-pointer hover:bg-primary/5 transition-colors"
+                className="group grid grid-cols-[140px_160px_150px_120px_170px_190px_220px_220px_190px] items-center border-b border-border px-3 py-2 text-[13px] last:border-b-0 cursor-pointer hover:bg-primary/5 transition-colors"
               >
                 <div className="sticky left-0 bg-white z-10 truncate transition-colors group-hover:bg-primary/5">{r.ucc}</div>
                 <div className="truncate">{r.name}</div>
@@ -194,7 +198,7 @@ export function CustomersPanel({ onSelectCustomer }: Props) {
                 <div>{r.lastTradedDate}</div>
                 <div className="text-muted-foreground">{r.brokerageGeneratedLast30Days}</div>
                 <div className="text-muted-foreground">{r.totalRevenueGeneratedLast30Days}</div>
-                <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                <div className="flex flex-wrap items-center gap-1.5">
                   {r.suggestedActions.map((action) => (
                     <span
                       key={`${r.ucc}-${action}`}
@@ -203,6 +207,23 @@ export function CustomersPanel({ onSelectCustomer }: Props) {
                       {action}
                     </span>
                   ))}
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveModal({
+                        type: "suggest",
+                        customerName: r.name,
+                        customerUcc: r.ucc,
+                        customerPhone: getCustomerDetail(r.ucc)?.profile.phone ?? "9999999999",
+                      });
+                    }}
+                    className="inline-flex items-center gap-0.5 text-xs font-semibold text-primary hover:underline whitespace-nowrap"
+                  >
+                    Suggest products <ChevronRight size={11} />
+                  </button>
                 </div>
               </div>
             ))}
@@ -233,6 +254,9 @@ export function CustomersPanel({ onSelectCustomer }: Props) {
           )}
         </div>
       </div>
+      {activeModal && (
+        <BOActionModal {...activeModal} onClose={() => setActiveModal(null)} />
+      )}
     </section>
   );
 }

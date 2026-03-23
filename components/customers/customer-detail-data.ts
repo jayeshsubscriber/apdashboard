@@ -338,6 +338,41 @@ function generateDetail(ucc: string, name: string, equityAumStr: string, mfAumSt
 }
 
 // ---------------------------------------------------------------------------
+// Name lookup for UCCs that appear in Business Opportunities but not customerRows
+// ---------------------------------------------------------------------------
+
+const BO_NAMES: Record<string, string> = {
+  SDKR3321:  "Sandeep Kumar",
+  HMLK8842:  "Harshali Mane",
+  PSHA4431:  "Prasad Shah",
+  ABHS1190:  "Amit Bhosale",
+  NSLK7163:  "Nikita Salunkhe",
+  RSWY8821:  "Rahul Suryawanshi",
+  SNIK2043:  "Shruti Naik",
+  MKRD1297:  "Manish Korde",
+  TPAT4471:  "Tejas Patil",
+  AKMB3905:  "Aarti Kamble",
+  B564881:   "Bhushan Subhash Shinde",
+  SHJV1187:  "Ajit Jaychand Dagade",
+  NTGV2197:  "Nitin Gavhane",
+  AKMR7165:  "Akash More",
+  SGKL6291:  "Sagar Kulkarni",
+  RHPT5408:  "Rohan Patil",
+  VVRA3108:  "Vivek Rane",
+  ANKS1472:  "Aniket Shinde",
+  PRCV9324:  "Priya Chavan",
+  KRJT5506:  "Kiran Jagtap",
+  DPMN7112:  "Deepali Mane",
+  SHJV2023:  "Nikhil Patankar",
+  GNKD4528:  "Ganesh Kadam",
+  YGPW6731:  "Yogesh Pawar",
+  SJKL2087:  "Sujata Koli",
+  NDSL1128:  "Ninad Salvi",
+  MRJT6650:  "Mrunal Jagtap",
+  AADK110932:"Neha Kulkarni",
+};
+
+// ---------------------------------------------------------------------------
 // Build lookup map from existing customerRows
 // ---------------------------------------------------------------------------
 
@@ -351,5 +386,8 @@ for (const row of customerRows) {
 }
 
 export function getCustomerDetail(ucc: string): CustomerDetail | null {
-  return detailMap.get(ucc) ?? null;
+  if (detailMap.has(ucc)) return detailMap.get(ucc)!;
+  // Generate a plausible detail for any UCC not in customerRows (e.g. from Business Opportunities)
+  const name = BO_NAMES[ucc] ?? ucc;
+  return generateDetail(ucc, name, "Rs 3,20,000", "Rs 1,50,000", "20 Mar 2026", "Rs 4,200");
 }

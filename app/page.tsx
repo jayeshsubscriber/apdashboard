@@ -74,7 +74,7 @@ export default function Home() {
         </div>
       )}
 
-      {activeTab === "dashboard" && <DashboardHome onNavigateToServicing={() => handleTabChange("servicing")} />}
+      {activeTab === "dashboard" && <DashboardHome onNavigateToServicing={() => handleTabChange("servicing")} onSelectCustomer={(ucc) => { setSelectedCustomerUcc(ucc); setActiveTab("customers"); }} />}
       {activeTab === "customers" &&
         (selectedCustomerUcc ? (
           <CustomerDetailView
